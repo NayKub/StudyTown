@@ -14,6 +14,8 @@
       <div class="sub" data-i18n="app.tagline"></div>
     </div>
 
+    <button class="sheetHandle" id="sheetHandle" type="button" aria-expanded="false"><i></i><span id="sheetLabel"></span></button>
+
     <div class="card timerCard">
       <div class="presets" id="presets"></div>
       <div class="ringwrap">
@@ -44,6 +46,11 @@
       <div class="mini" id="mini"></div>
     </div>
 
+    <div class="card friendsCard" id="friendsCard" hidden>
+      <div class="row"><b data-i18n="friends.title"></b><span class="count" id="friendCount"></span></div>
+      <div id="friendsBody"></div>
+    </div>
+
     <div class="card statsCard">
       <div class="stats">
         <div class="stat"><small data-i18n="stats.total"></small><b id="sTotal"></b></div>
@@ -60,9 +67,12 @@
     <div class="badge" id="badge"></div>
     <div class="previewTag" id="previewTag" data-i18n="preview.tag"></div>
     <div class="stageBtns">
+      <button class="round" id="accountBtn" data-i18n-label="a11y.account">👤</button>
       <button class="round" id="logBtn" data-i18n-label="a11y.log">📅</button>
       <button class="round" id="settingsBtn" data-i18n-label="a11y.settings">⚙️</button>
     </div>
+    <div class="visitBar" id="visitBar" hidden><span id="visitText"></span><button class="chip on" id="visitBack" data-i18n="visit.back"></button></div>
+    <div class="sheetShade" id="sheetShade"></div>
     <div class="toasts" id="toasts"></div>
     <div class="hint" data-i18n="hint"></div>
     <div class="preview">
@@ -103,6 +113,16 @@
     <div class="xlab" id="xlab"></div>
     <h3 data-i18n="log.daily"></h3>
     <div id="dayList"></div>
+  </div>
+</div>
+
+<div class="modal sheet" id="accountModal">
+  <div class="card">
+    <div class="sheetHead">
+      <h2 id="accTitle"></h2>
+      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+    </div>
+    <div id="accBody"></div>
   </div>
 </div>
 

@@ -9,6 +9,46 @@ function shade(hex, amt){ const n=parseInt(hex.slice(1),16); let r=n>>16,g=(n>>8
   if(amt>0){ r+= (255-r)*amt; g+=(255-g)*amt; b+=(255-b)*amt; } else { r*=1+amt; g*=1+amt; b*=1+amt; }
   return 'rgb('+(r|0)+','+(g|0)+','+(b|0)+')'; }
 
+
+// ---------- shop signboard: a little wooden board on the roof with a drawn icon (no text) ----------
+function rrect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+const SHOP_ICONS = ['cupcake','coffee','flower','icecream'];
+function shopSign(x, top, seed, night, now){
+  const icon = SHOP_ICONS[Math.floor(hash(seed,5,9)*SHOP_ICONS.length)];
+  const sway = Math.sin(now/900 + seed)*0.04;
+  const bw=24, bh=16, by=top-24;
+  // posts
+  ctx.fillStyle='#8a5a3c'; ctx.fillRect(x-8,by+bh-2,2.5,10); ctx.fillRect(x+5.5,by+bh-2,2.5,10);
+  ctx.save(); ctx.translate(x, by+bh/2); ctx.rotate(sway); ctx.translate(-x, -(by+bh/2));
+  // board with darker rim and wood stripes
+  rrect(x-bw/2-1.5, by-1.5, bw+3, bh+3, 5); ctx.fillStyle='#a8754f'; ctx.fill();
+  rrect(x-bw/2, by, bw, bh, 4); ctx.fillStyle= night ? '#f3d9a8' : '#ffe2b0'; ctx.fill();
+  ctx.strokeStyle='rgba(168,117,79,.25)'; ctx.lineWidth=0.8; ctx.beginPath(); ctx.moveTo(x-bw/2+3,by+5.5); ctx.lineTo(x+bw/2-3,by+5.5); ctx.moveTo(x-bw/2+3,by+11); ctx.lineTo(x+bw/2-3,by+11); ctx.stroke();
+  // tiny pink bow on top
+  ctx.fillStyle='#ff8fab'; ctx.beginPath(); ctx.ellipse(x-3,by-1.5,3,2,-0.4,0,7); ctx.ellipse(x+3,by-1.5,3,2,0.4,0,7); ctx.fill(); ctx.beginPath(); ctx.arc(x,by-1.5,1.4,0,7); ctx.fillStyle='#e86d8d'; ctx.fill();
+  const ix=x, iy=by+bh/2+0.5;
+  if (icon==='cupcake'){
+    ctx.fillStyle='#7fa8ff'; ctx.beginPath(); ctx.moveTo(ix-4.5,iy); ctx.lineTo(ix+4.5,iy); ctx.lineTo(ix+3,iy+5); ctx.lineTo(ix-3,iy+5); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#ffc4d6'; ctx.beginPath(); ctx.arc(ix-2.5,iy-0.5,2.6,0,7); ctx.arc(ix+2.5,iy-0.5,2.6,0,7); ctx.arc(ix,iy-2.8,2.8,0,7); ctx.fill();
+    ctx.fillStyle='#ff4d6d'; ctx.beginPath(); ctx.arc(ix,iy-5.6,1.4,0,7); ctx.fill();
+  } else if (icon==='coffee'){
+    ctx.fillStyle='#fff'; rrect(ix-4.5,iy-3,8,7,2); ctx.fill(); ctx.strokeStyle='#a8754f'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(ix+4,iy+0.5,2,-1.4,1.4); ctx.stroke();
+    ctx.fillStyle='#8a5a3c'; ctx.fillRect(ix-3.5,iy-2,6,1.6);
+    ctx.strokeStyle='rgba(168,117,79,.7)'; ctx.lineWidth=0.8; ctx.beginPath(); ctx.moveTo(ix-2,iy-4); ctx.quadraticCurveTo(ix-3,iy-5.5,ix-1.5,iy-6.5); ctx.moveTo(ix+1,iy-4); ctx.quadraticCurveTo(ix,iy-5.5,ix+1.5,iy-6.5); ctx.stroke();
+  } else if (icon==='flower'){
+    ctx.fillStyle='#ff8fab'; for(let k=0;k<5;k++){ const a=k*1.2566-1.57; ctx.beginPath(); ctx.arc(ix+Math.cos(a)*3,iy-1+Math.sin(a)*3,2.2,0,7); ctx.fill(); }
+    ctx.fillStyle='#ffd36e'; ctx.beginPath(); ctx.arc(ix,iy-1,1.8,0,7); ctx.fill();
+    ctx.strokeStyle='#5fbf6e'; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(ix,iy+2); ctx.lineTo(ix,iy+6); ctx.stroke();
+  } else {
+    ctx.fillStyle='#e9b77a'; ctx.beginPath(); ctx.moveTo(ix-3.2,iy); ctx.lineTo(ix+3.2,iy); ctx.lineTo(ix,iy+6.5); ctx.closePath(); ctx.fill();
+    ctx.fillStyle='#b8e6b0'; ctx.beginPath(); ctx.arc(ix,iy-1,3.6,0,7); ctx.fill();
+    ctx.fillStyle='#ffc4d6'; ctx.beginPath(); ctx.arc(ix,iy-4,2.8,0,7); ctx.fill();
+    ctx.fillStyle='#ff4d6d'; ctx.beginPath(); ctx.arc(ix+0.5,iy-6.6,1.2,0,7); ctx.fill();
+  }
+  ctx.restore();
+}
+
 // ---------- residents ----------
 const SPECIES = ['bunny','cat','bear','chick','frog','pig'];
 const CHAR_COL = {bunny:'#fff4f8',cat:'#ffd9a8',bear:'#d9b08c',chick:'#ffe680',frog:'#a8e6a1',pig:'#ffc4d6'};
@@ -135,7 +175,7 @@ function drawPlot(p, minutes, night, now){
     const a0=[pr.L[0],pr.L[1]-12], b0=[pr.B[0],pr.B[1]-12];
     for(let k=0;k<6;k++){ const u0=k/6,u1=(k+1)/6; const pt=(u,d)=>[a0[0]+(b0[0]-a0[0])*u-d*0.9, a0[1]+(b0[1]-a0[1])*u+d*0.4]; poly([pt(u0,0),pt(u1,0),pt(u1,7),pt(u0,7)], k%2?'#fff':p.roof); }
     faceQuad(pr.L,pr.B,0.3,0.7,0,6, night?'#ffe48a':'#ffd36e');
-    if (tier===2){ ctx.fillStyle=p.roof; ctx.font='bold 9px Mali'; ctx.fillText('SHOP', cx-12, cy-h+2); }
+    shopSign(cx, cy-h, seed, night, now);
   } else if (p.kind==='trees'){
     const spots=[[0,0],[-12,-4],[11,-3],[0,-9]].slice(0,tier+1+(tier>1?1:0));
     spots.sort((a,b)=>a[1]-b[1]).forEach(([dx,dy],k)=>tree(cx+dx,cy+dy+4,0.8+hash(seed,k)*0.35, ['#7ccf7a','#5fbf6e','#9ad66a','#ff9fb8'][Math.floor(hash(seed,k,5)*4)]));

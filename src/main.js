@@ -8,7 +8,8 @@ import { plots, tierOf, cityAt } from './city.js';
 import { initI18n, setLang, applyI18n, t, lang, locale, detectLang, fmtMin, LANGS } from './i18n.js';
 import { loadState, saveState, loadSettings, saveSettings } from './storage.js';
 import * as native from './native.js';
-import { startRender, syncChars } from './render.js';
+import { startRender, syncChars, resetView } from './render.js';
+import * as account from './account.js';
 
 const $ = (id) => document.getElementById(id);
 const PRESETS = [15, 25, 45, 60];
@@ -127,6 +128,7 @@ function endSession(done, m) {
   timer.active = false; timer.running = false; timer.before = 0; timer.credited = 0;
   native.cancelDone(); applyAwake();
   setPresetsDisabled(false); saveNow(); renderTimer(); renderMini();
+  account.sync(true);
   if (done) {
     chime(); if (G.settings.haptics) native.buzz('success');
     $('doneText').textContent = t('done.text', { m });
@@ -200,6 +202,7 @@ function setPreview(on) {
 function renderPvVal() { $('pvVal').textContent = t('unit.h', { h: $('pvRange').value }); }
 $('pvOn').addEventListener('change', (e) => {
   if (timer.running) { e.target.checked = false; toast(t('preview.off')); return; }
+  if (G.visit) endVisit();
   setPreview(e.target.checked);
 });
 $('pvRange').addEventListener('input', (e) => { G.previewMin = Math.round(+e.target.value * 60); renderPvVal(); });
@@ -258,7 +261,7 @@ $('settingsBtn').addEventListener('click', () => { renderSettings(); $('settings
 $('langTabs').addEventListener('click', async (e) => {
   const b = e.target.closest('.chip'); if (!b) return;
   G.settings.lang = b.dataset.lang; saveSettings(G.settings);
-  await setLang(G.settings.lang); renderAll();
+  await setLang(G.settings.lang); renderAll(); account.onLanguageChange();
 });
 document.querySelectorAll('[data-setting]').forEach((el) => el.addEventListener('change', () => {
   G.settings[el.dataset.setting] = el.checked; saveSettings(G.settings);
@@ -273,7 +276,94 @@ document.querySelectorAll('.modal.sheet').forEach((mod) => mod.addEventListener(
 
 function renderAll() {
   applyI18n(); renderPresets(); renderTimer(); refreshUI(); renderMini(); renderPvVal(); renderSettings();
+  if ($('sheetLabel')) $('sheetLabel').textContent = t(sheetOpen ? 'sheet.less' : 'sheet.more');
+  if (G.visit) $('visitText').textContent = t('visit.title', { name: G.visit.name });
   if ($('logModal').classList.contains('show')) renderLog();
+}
+
+
+// ---------- cloud backup hooks ----------
+function weekMinutes() { return lastDays(7).reduce((a, x) => a + dayMin(x.k), 0); }
+function computeStats() {
+  const k = todayKey();
+  return { totalMin: realMin(), todayMin: dayMin(k), dayKey: k, weekMin: weekMinutes(), streak: streak() };
+}
+/** Swap in merged data after logging in (the running session, if any, is kept). */
+function replaceState(merged) {
+  const keepTimer = G.state.timer;
+  G.state = { ...merged, timer: keepTimer };
+  lastMinutes = realMin(); snapshotTiers();
+  G.city = cityAt(curMin()); syncChars(true);
+  saveNow(); refreshUI(); renderMini();
+  if ($('logModal').classList.contains('show')) renderLog();
+}
+
+// ---------- visiting a friend's town ----------
+function startVisit(v) {
+  if (G.preview) { $('pvOn').checked = false; setPreview(false); }
+  G.visit = v; document.body.classList.add('visiting');
+  $('visitBar').hidden = false; $('visitText').textContent = t('visit.title', { name: v.name });
+  setSheet(false); resetView();
+  G.city = cityAt(curMin()); syncChars(true); refreshUI();
+}
+function endVisit() {
+  G.visit = null; document.body.classList.remove('visiting'); $('visitBar').hidden = true;
+  resetView(); G.city = cityAt(curMin()); syncChars(true); refreshUI();
+}
+$('visitBack').addEventListener('click', endVisit);
+
+// ---------- bottom sheet (phone portrait) ----------
+const side = document.querySelector('.side');
+const portraitMQ = window.matchMedia('(max-width:820px) and (orientation:portrait)');
+let sheetOpen = false;
+function measurePeek() {
+  if (!portraitMQ.matches) return;
+  const next = document.querySelector('.next');
+  const pad = parseFloat(getComputedStyle(side).paddingBottom) || 10;
+  const peek = Math.ceil(next.offsetTop + next.offsetHeight + pad + side.scrollTop * 0);
+  document.documentElement.style.setProperty('--peek', peek + 'px');
+}
+function setSheet(open) {
+  sheetOpen = open && portraitMQ.matches;
+  side.classList.toggle('open', sheetOpen);
+  document.body.classList.toggle('sheetOpen', sheetOpen);
+  $('sheetHandle').setAttribute('aria-expanded', String(sheetOpen));
+  $('sheetLabel').textContent = t(sheetOpen ? 'sheet.less' : 'sheet.more');
+  if (!sheetOpen) side.scrollTop = 0;
+  side.style.height = '';
+}
+function initSheet() {
+  const handle = $('sheetHandle');
+  let drag = null;
+  handle.addEventListener('pointerdown', (e) => {
+    if (!portraitMQ.matches) return;
+    drag = { y: e.clientY, h: side.getBoundingClientRect().height, moved: 0 };
+    try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+    side.classList.add('dragging');
+  });
+  handle.addEventListener('pointermove', (e) => {
+    if (!drag) return;
+    const dy = e.clientY - drag.y; drag.moved = Math.max(drag.moved, Math.abs(dy));
+    const max = window.innerHeight * 0.88, min = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--peek')) || 200;
+    side.style.height = clamp(drag.h - dy, min, max) + 'px';
+  });
+  const end = (e) => {
+    if (!drag) return;
+    side.classList.remove('dragging');
+    const h = side.getBoundingClientRect().height, start = drag.h, moved = drag.moved; drag = null;
+    if (moved < 6) setSheet(!sheetOpen);                 // tap toggles
+    else setSheet(h > start ? h - start > 40 : start - h < 40); // swipe up opens, swipe down closes
+  };
+  handle.addEventListener('pointerup', end); handle.addEventListener('pointercancel', end);
+  $('sheetShade').addEventListener('click', () => setSheet(false));
+  // swipe down on the open sheet when it is scrolled to the top closes it
+  let ts = null;
+  side.addEventListener('touchstart', (e) => { ts = sheetOpen && side.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
+  side.addEventListener('touchmove', (e) => { if (ts != null && e.touches[0].clientY - ts > 90) { ts = null; setSheet(false); } }, { passive: true });
+  new ResizeObserver(measurePeek).observe(document.querySelector('.timerCard'));
+  new ResizeObserver(measurePeek).observe(document.querySelector('.next'));
+  portraitMQ.addEventListener('change', () => { setSheet(false); measurePeek(); });
+  measurePeek(); setSheet(false);
 }
 
 // ---------- app lifecycle ----------
@@ -284,6 +374,7 @@ function onActive(active) {
   } else {
     if (timer.running) credit();
     saveNow();
+    account.sync(true);
     if (timer.running && G.settings.notify) {
       const at = new Date(timer.startedAt + (timer.dur - timer.before) * 1000);
       if (at.getTime() > Date.now() + 1000) native.scheduleDone(at, t('notif.title'), t('notif.body', { m: Math.round(timer.dur / 60) }));
@@ -307,6 +398,8 @@ async function boot() {
   lastMinutes = realMin(); snapshotTiers();
   startRender($('cv'));
   renderAll();
+  initSheet();
+  account.initAccount({ getState: () => G.state, replaceState, stats: computeStats, visit: startVisit, toast });
   applyAwake();
   tick();
   setInterval(tick, 250);

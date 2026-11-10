@@ -18,6 +18,7 @@ h2{margin:0;font-size:20px} h3{margin:18px 0 4px;font-size:16px}
   padding:max(16px,var(--sat)) max(16px,var(--sar)) max(16px,var(--sab)) max(16px,var(--sal))}
 .side{width:340px;flex:none;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding-bottom:4px;scrollbar-width:none}
 .side::-webkit-scrollbar{display:none}
+.side>.card{flex:none}
 .card{background:var(--card);border-radius:22px;padding:18px;box-shadow:0 4px 0 var(--line),0 10px 24px rgba(120,80,60,.08);border:2px solid var(--line)}
 .card.center{text-align:center}
 h1{font-size:22px;margin:0;display:flex;align-items:center;gap:8px}
@@ -113,13 +114,80 @@ canvas.drag{cursor:grabbing}
 .switch:checked{background:var(--pink)}
 .switch:checked::after{transform:translateX(20px)}
 
-/* ---------- phone, portrait: town on top, timer panel below ---------- */
+/* ---------- account, friends, visiting ---------- */
+.noCloud #accountBtn{display:none}
+#accountBtn.in{background:var(--pink);border-color:var(--pinkd)}
+.friendsCard[hidden],.visitBar[hidden]{display:none}
+.friendsCard .count{background:var(--pink);color:#fff;border-radius:99px;padding:0 9px;font-size:13px;font-weight:700}
+.friendsCard .count:empty{display:none}
+.friendsCard h4{margin:14px 0 4px;font-size:13px;color:var(--soft)}
+.friendsCard .btn{width:100%;margin-top:4px}
+.addRow{display:flex;gap:8px;margin-top:12px}
+.addRow input,.form input{flex:1;min-width:0;border:2px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff;font-size:16px;-webkit-user-select:text;user-select:text}
+.addRow input:focus,.form input:focus{outline:none;border-color:var(--pink)}
+.addRow .btn{flex:none;width:auto;margin:0;padding:10px 16px;min-height:44px}
+.codeLine{font-size:13px;color:var(--soft);margin-top:8px}
+.codeLine b{color:var(--ink);letter-spacing:1px}
+.fRow{display:flex;align-items:center;gap:8px;padding:8px 0;border-top:2px dashed var(--line)}
+.fRow:first-of-type{border-top:none}
+.fRow.confirm{background:#fff2f4;border-radius:12px;padding:8px;border:none}
+.fMain{flex:1;min-width:0}
+.fMain b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.fMain small{display:block;color:var(--soft);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fRow .chip{padding:5px 10px;font-size:13px}
+.chip.red{background:#ff6b81;border-color:#e0506a;color:#fff}
+.chip.ghostX{border-color:transparent;background:none;font-size:16px;padding:4px 6px}
+.avatar{width:36px;height:36px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;color:var(--ink);flex:none;border:2px solid #fff;box-shadow:0 0 0 2px var(--line)}
+.fine{font-size:12px;color:var(--soft);margin:8px 0}
+.formMsg{font-size:13px;margin:4px 0;border-radius:10px;padding:8px 10px}
+.formMsg.err{background:#fff0f2;color:#c2415a}
+.formMsg.ok{background:#effbea;color:#3f8a3a}
+.formMsg .linkbtn{padding:0 0 0 4px;font-size:13px}
+.form{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--soft)}
+.form .btn{width:100%}
+.tabs.seg{background:#f5e8da;border-radius:99px;padding:4px;flex-wrap:nowrap}
+.tabs.seg .chip{flex:1;border-color:transparent;background:none}
+.tabs.seg .chip.on{background:#fff;color:var(--ink);border-color:var(--line)}
+.btn.red{background:#ff6b81;box-shadow:0 4px 0 #e0506a}
+.btn:disabled{opacity:.6}
+.linkbtn.red{color:#d9475f}
+.me{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.me .avatar{width:52px;height:52px;font-size:22px}
+.me b{display:block;font-size:18px}
+.me small{color:var(--soft)}
+.pill{display:inline-block;border-radius:99px;padding:2px 10px;font-size:12px;font-weight:600}
+.pill.ok{background:#effbea;color:#3f8a3a}
+.warnBox{background:#fff7e0;border-radius:12px;padding:10px 12px;font-size:13px}
+.row.gap{justify-content:flex-start;gap:16px}
+.codeBox{display:flex;align-items:center;gap:10px;background:#fff7ee;border-radius:16px;padding:12px 14px;margin:12px 0}
+.codeBox small{color:var(--soft);font-size:12px}
+.codeBox b{flex:1;font-size:22px;letter-spacing:2px}
+.danger{border-top:2px dashed var(--line);margin-top:16px;padding-top:6px;text-align:center}
+#accountModal .btn.ghost{width:100%;margin-top:6px}
+.visitBar{position:absolute;left:50%;top:70px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(255,253,249,.96);border:2px solid var(--pink);border-radius:16px;padding:6px 6px 6px 14px;font-weight:700;font-size:14px;z-index:2;white-space:nowrap;max-width:calc(100% - 24px)}
+.visitBar span{overflow:hidden;text-overflow:ellipsis}
+body.visiting .toasts{top:118px}
+.sheetHandle,.sheetShade{display:none}
+
+/* ---------- phone, portrait: town fills the screen, controls live in a bottom sheet ---------- */
 @media (max-width:820px) and (orientation:portrait){
   :root{--ring:108px}
-  .app{flex-direction:column-reverse;gap:10px;
-    padding:max(10px,var(--sat)) max(10px,var(--sar)) max(10px,var(--sab)) max(10px,var(--sal))}
-  .side{width:100%;overflow:visible;gap:8px;padding:0}
-  .side .head,.side .week,.side .statsCard{display:none}
+  .app{flex-direction:column;gap:10px;
+    padding:max(10px,var(--sat)) max(10px,var(--sar)) calc(var(--peek,250px) + 10px) max(10px,var(--sal))}
+  .stage{border-radius:22px}
+  .side{position:fixed;left:0;right:0;bottom:0;z-index:6;width:auto;gap:8px;
+    height:var(--peek,250px);max-height:calc(100dvh - var(--sat) - 40px);
+    padding:0 max(10px,var(--sar)) calc(10px + var(--sab)) max(10px,var(--sal));
+    background:var(--bg);border-radius:26px 26px 0 0;box-shadow:0 -6px 24px rgba(120,80,60,.14);
+    overflow:hidden;transition:height .38s cubic-bezier(.2,.9,.25,1);overscroll-behavior:contain}
+  .side.dragging{transition:none}
+  .side.open{height:88dvh;overflow-y:auto}
+  .side .head{display:none}
+  .sheetHandle{display:flex;flex-direction:column;align-items:center;gap:4px;flex:none;width:100%;border:none;background:var(--bg);padding:8px 0 4px;position:sticky;top:0;z-index:2;cursor:grab;touch-action:none;color:var(--soft);font-size:12px}
+  .sheetHandle i{display:block;width:44px;height:5px;border-radius:99px;background:#e3d3c1}
+  .sheetShade{display:block;position:absolute;inset:0;background:rgba(74,59,82,.25);opacity:0;pointer-events:none;transition:opacity .3s;z-index:3}
+  .sheetOpen .sheetShade{opacity:1;pointer-events:auto}
   .timerCard{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"ring presets" "ring btns";gap:8px 12px;align-items:center;padding:12px}
   .presets{grid-area:presets;flex-wrap:nowrap;overflow-x:auto;margin:0;scrollbar-width:none;padding-bottom:2px}
   .presets::-webkit-scrollbar{display:none}
@@ -129,16 +197,16 @@ canvas.drag{cursor:grabbing}
   .btn{padding:10px 8px;font-size:15px}
   .next{padding:10px 14px;border-radius:18px}
   .next .bar{height:10px;margin:6px 0 4px}
-  .stage{border-radius:22px}
+  .side .card{flex:none}
   .hint{display:none}
   .preview{left:12px;right:12px}
 }
-/* ---------- phone, landscape: narrow side panel ---------- */
+/* ---------- phone, landscape: narrow side panel that scrolls ---------- */
 @media (max-height:520px) and (orientation:landscape){
   :root{--ring:120px}
   .app{gap:10px;padding:max(8px,var(--sat)) max(8px,var(--sar)) max(8px,var(--sab)) max(8px,var(--sal))}
-  .side{width:290px;gap:8px}
-  .side .head,.side .week,.side .statsCard{display:none}
+  .side{width:300px;gap:8px}
+  .side .head{display:none}
   .card{padding:12px}
   .presets{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:6px}
   .time span{display:none}

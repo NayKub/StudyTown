@@ -16,6 +16,19 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+  rules:
+    name: firestore rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - name: Test security rules in the Firestore emulator
+        run: npm run test:rules
+
   android:
     needs: web
     runs-on: ubuntu-latest

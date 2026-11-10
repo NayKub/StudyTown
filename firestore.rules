@@ -1,0 +1,68 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isMe(uid) { return signedIn() && request.auth.uid == uid; }
+    function areFriends(a, b) { return exists(/databases/$(database)/documents/friends/$(a)/list/$(b)); }
+    function shortText(v, n) { return v is string && v.size() <= n; }
+
+    // Public stats: the owner and their friends can read them.
+    match /profiles/{uid} {
+      allow read: if isMe(uid) || (signedIn() && areFriends(uid, request.auth.uid));
+      allow create, update: if isMe(uid)
+        && shortText(request.resource.data.name, 40)
+        && request.resource.data.code is string
+        && request.resource.data.totalMin is number && request.resource.data.totalMin >= 0;
+      allow delete: if isMe(uid);
+    }
+
+    // Friend code -> uid. Exact lookups only; listing every code is not allowed.
+    match /codes/{code} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid
+        && code.size() == 6 && shortText(request.resource.data.name, 40);
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+        && request.resource.data.uid == request.auth.uid && shortText(request.resource.data.name, 40);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Email -> uid, so friends can be added by exact email. Only your own address can be registered.
+    match /emails/{email} {
+      allow get: if signedIn();
+      allow list: if false;
+      allow create, update: if signedIn() && request.auth.token.email == email
+        && request.resource.data.uid == request.auth.uid && shortText(request.resource.data.name, 40);
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
+
+    // Cloud backup of the town and study log. Owner only.
+    match /backups/{uid} {
+      allow read, write: if isMe(uid) && (request.resource == null || request.resource.data.state.size() < 900000);
+    }
+
+    // Friend requests. Document id is "{from}_{to}".
+    match /requests/{id} {
+      allow read: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.from == request.auth.uid
+        && request.resource.data.to is string
+        && request.resource.data.to != request.auth.uid
+        && id == request.auth.uid + '_' + request.resource.data.to
+        && !areFriends(request.auth.uid, request.resource.data.to)
+        && shortText(request.resource.data.fromName, 40) && shortText(request.resource.data.toName, 40);
+      allow delete: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+    }
+
+    // Friend lists. A friendship is created only by accepting an existing request,
+    // and either friend can end it.
+    match /friends/{uid}/list/{fid} {
+      allow read: if isMe(uid);
+      allow create: if signedIn() && shortText(request.resource.data.name, 40) && (
+        (request.auth.uid == uid && exists(/databases/$(database)/documents/requests/$(fid + '_' + uid))) ||
+        (request.auth.uid == fid && exists(/databases/$(database)/documents/requests/$(uid + '_' + fid)))
+      );
+      allow delete: if signedIn() && (request.auth.uid == uid || request.auth.uid == fid);
+    }
+  }
+}
