@@ -52,7 +52,7 @@ async function onAuth(u) {
     stopSocial = cloud.watchSocial((s) => { social = s; renderFriends(); });
     await restoreAndSync();
     // keep listening: when another device on this account uploads, merge it in right away
-    if (user && user.uid === u.uid) stopBackup = cloud.watchBackup(onRemoteBackup, (e) => setSync('err', e));
+    if (user && user.uid === u.uid) startWatch();
   }
   renderAccount(); renderFriends();
 }
@@ -79,9 +79,25 @@ function setSync(status, e) {
 const sig = (st) => `${st.totalSec}|${Object.keys(st.days || {}).length}|${(st.sessions || []).length}`;
 const pushKey = (st) => sig(st) + '|' + todayKey();
 
+let lastFull = 0, fullJob = null;
+function startWatch() {
+  if (stopBackup) stopBackup();
+  // a listener that hits an error is dead, so it is dropped here and restarted by refresh()
+  stopBackup = cloud.watchBackup(onRemoteBackup, (e) => { stopBackup = null; setSync('err', e); });
+}
+/** Called when the app comes to the front and every few seconds: catches up and repairs a failed sync by itself. */
+export function refresh(becameActive) {
+  if (!user || fullJob) return;
+  const since = Date.now() - lastFull;
+  const broken = syncState.status === 'err' || !stopBackup;
+  if ((becameActive && since > 15000) || (broken && since > 30000)) {
+    lastFull = Date.now();
+    fullJob = restoreAndSync().then(() => { if (user && !stopBackup && syncState.status === 'ok') startWatch(); }).finally(() => { fullJob = null; });
+  }
+}
 /** Download the cloud copy, merge it with this device, upload the result. */
 async function restoreAndSync() {
-  setSync('busy');
+  if (syncState.status !== 'ok') setSync('busy');
   try {
     const remote = await cloud.pullBackup();
     if (remote) {
@@ -89,8 +105,8 @@ async function restoreAndSync() {
       if (sig(merged) !== sig(local)) H.replaceState(merged);
     }
     const st = H.getState();
-    await Promise.all([cloud.pushBackup(st), cloud.pushStats(H.stats())]);
-    pushedSig = pushKey(st); lastSync = Date.now();
+    if (!remote || sig(st) !== sig(remote) || pushKey(st) !== pushedSig) await Promise.all([cloud.pushBackup(st), cloud.pushStats(H.stats())]);
+    pushedSig = pushKey(st); lastSync = Date.now(); lastFull = Date.now();
     setSync('ok');
   } catch (e) { setSync('err', e); }
 }
@@ -151,7 +167,7 @@ function renderAccount() {
     ${syncState.status === 'err'
       ? `<div class="warnBox">⚠️ ${t(syncState.code === 'permission-denied' ? 'acc.syncErrPerm' : syncState.code === 'unavailable' ? 'acc.err.net' : 'acc.syncErrOther', { code: esc(syncState.code) })}</div>`
       : `<p class="fine">☁️ ${syncState.status === 'ok' ? t('acc.syncOk', { time: new Date(syncState.at).toLocaleTimeString(lang() === 'th' ? 'th-TH' : 'en-US', { hour: '2-digit', minute: '2-digit' }) }) : t('acc.syncing')}</p>`}
-    <button class="btn ghost" data-act="syncNow" ${busy ? 'disabled' : ''}>🔄 ${t('acc.syncNow')}</button>
+
     ${note}
     <button class="btn ghost" data-act="logout">${t('acc.logout')}</button>
     <div class="danger">
@@ -203,7 +219,6 @@ function onAccountClick(e) {
   } else if (act === 'resend') run(async () => { await cloud.resendVerification(); msg = { text: t('acc.verifySent'), kind: 'ok' }; });
   else if (act === 'checkVerified') run(async () => { const u = await cloud.refreshUser(); user = { ...user, verified: u.verified }; msg = u.verified ? { text: '', kind: '' } : { text: t('acc.stillNot'), kind: 'err' }; });
   else if (act === 'copyCode') copy(cloud.fmtCode(user.code));
-  else if (act === 'syncNow') run(async () => { await restoreAndSync(); if (syncState.status === 'ok') H.toast(t('acc.syncDone')); })
   else if (act === 'logout') run(async () => { await sync(true); await cloud.logOut(); $('accountModal').classList.remove('show'); H.toast(t('acc.bye')); });
   else if (act === 'delete') { showDelete = true; msg = { text: '', kind: '' }; renderAccount(); }
   else if (act === 'cancelDelete') { showDelete = false; renderAccount(); }

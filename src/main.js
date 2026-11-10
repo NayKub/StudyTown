@@ -23,7 +23,7 @@ function saveNow() {
   saveState(G.state);
   lastSaved = Date.now(); dirty = false;
 }
-function maybeSave() { if (dirty && Date.now() - lastSaved > 30000) saveNow(); account.sync(false); }
+function maybeSave() { if (dirty && Date.now() - lastSaved > 30000) saveNow(); account.sync(false); account.refresh(false); }
 
 // ---------- growth tracking ----------
 let lastMinutes = 0, tierSnap = {};
@@ -371,6 +371,7 @@ function onActive(active) {
   if (active) {
     native.cancelDone(); // we are on screen, the in-app chime handles it
     tick();
+    account.refresh(true); // pull anything another device added while we were away
     account.sync(false);
   } else {
     if (timer.running) credit();
