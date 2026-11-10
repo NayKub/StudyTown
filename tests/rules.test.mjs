@@ -61,6 +61,10 @@ test('own profile, backup and friend list are readable by the owner', async () =
   await assertSucceeds(getDocs(collection(as('alice'), 'friends/alice/list')));
   await assertSucceeds(setDoc(doc(as('alice'), 'profiles/alice'), { name: 'Alice', code: 'AAAAAA', totalMin: 0 }));
   await assertSucceeds(setDoc(doc(as('alice'), 'profiles/alice'), { totalMin: 5, streak: 1 }, { merge: true }));
+  await assertSucceeds(setDoc(doc(as('alice'), 'backups/alice'), { state: '{"totalSec":60}' }));
+  await assertSucceeds(getDoc(doc(as('alice'), 'backups/alice')));
+  await assertSucceeds(deleteDoc(doc(as('alice'), 'backups/alice')));
+  await assertSucceeds(deleteDoc(doc(as('alice'), 'emails/nobody@test.com')));
 });
 
 test('friendship only by accepting a request, either side can end it', async () => {
