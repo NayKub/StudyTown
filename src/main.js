@@ -23,7 +23,7 @@ function saveNow() {
   saveState(G.state);
   lastSaved = Date.now(); dirty = false;
 }
-function maybeSave() { if (dirty && Date.now() - lastSaved > 30000) saveNow(); }
+function maybeSave() { if (dirty && Date.now() - lastSaved > 30000) saveNow(); account.sync(false); }
 
 // ---------- growth tracking ----------
 let lastMinutes = 0, tierSnap = {};
@@ -371,6 +371,7 @@ function onActive(active) {
   if (active) {
     native.cancelDone(); // we are on screen, the in-app chime handles it
     tick();
+    account.sync(false);
   } else {
     if (timer.running) credit();
     saveNow();

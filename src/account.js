@@ -12,7 +12,8 @@ const avatar = (name, uid) => `<span class="avatar" style="background:${COLORS[[
 let H = null;              // hooks from main.js
 let user = null;           // { uid, email, name, verified, code } or null
 let social = { incoming: [], outgoing: [], friends: [] };
-let stopSocial = null;
+let stopSocial = null, stopBackup = null;
+let pushedSig = '';        // what we last uploaded, to skip uploads when nothing changed
 let tab = 'login';         // which form the guest view shows
 let busy = false;
 let msg = { text: '', kind: '' };       // message under the account form
@@ -43,11 +44,15 @@ export function openAccount() { msg = { text: '', kind: '' }; showDelete = false
 async function onAuth(u) {
   const was = user && user.uid;
   user = u;
+  if (u && u.uid === was) { renderAccount(); renderFriends(); return; } // same person, details refreshed
   if (stopSocial) { stopSocial(); stopSocial = null; }
-  social = { incoming: [], outgoing: [], friends: [] };
+  if (stopBackup) { stopBackup(); stopBackup = null; }
+  social = { incoming: [], outgoing: [], friends: [] }; pushedSig = '';
   if (u) {
     stopSocial = cloud.watchSocial((s) => { social = s; renderFriends(); });
-    if (u.uid !== was) await restoreAndSync();
+    await restoreAndSync();
+    // keep listening: when another device on this account uploads, merge it in right away
+    if (user && user.uid === u.uid) stopBackup = cloud.watchBackup(onRemoteBackup);
   }
   renderAccount(); renderFriends();
 }
@@ -69,16 +74,26 @@ async function restoreAndSync() {
     const remote = await cloud.pullBackup();
     if (remote) H.replaceState(mergeStates(H.getState(), remote));
     await sync(true);
-  } catch (e) { /* offline: the next sync will catch up */ }
+  } catch (e) { console.error('restore failed', e); /* offline: the next sync will catch up */ }
 }
-/** Upload backup + public stats. Throttled to once a minute unless forced. */
+const sig = (st) => `${st.totalSec}|${Object.keys(st.days || {}).length}|${(st.sessions || []).length}`;
+function onRemoteBackup(remote) {
+  const local = H.getState(); const merged = mergeStates(local, remote);
+  if (sig(merged) !== sig(local) || merged.totalSec !== local.totalSec) H.replaceState(merged); // the other device had something new
+  if (sig(merged) !== sig(remote)) sync(true);                                                  // this device had something new
+  else pushedSig = sig(merged);
+}
+/** Upload backup + public stats. Skipped when nothing changed; throttled to once a minute unless forced. */
 export function sync(force) {
   if (!user) return Promise.resolve();
+  const st = H.getState(); const now = sig(st) + '|' + todayKey();
+  if (now === pushedSig) return Promise.resolve();
   if (!force && Date.now() - lastSync < 60000) return Promise.resolve();
   if (syncing) return syncing;
   lastSync = Date.now();
-  syncing = Promise.all([cloud.pushBackup(H.getState()), cloud.pushStats(H.stats())])
-    .catch(() => { lastSync = 0; })
+  syncing = Promise.all([cloud.pushBackup(st), cloud.pushStats(H.stats())])
+    .then(() => { pushedSig = now; })
+    .catch((e) => { lastSync = 0; console.error('sync failed', e); })
     .finally(() => { syncing = null; renderAccount(); });
   return syncing;
 }
@@ -228,10 +243,12 @@ async function onAddFriend(e) {
     if (target.uid === user.uid) return say('friends.self');
     if (social.friends.some((f) => f.uid === target.uid)) return say('friends.already', { name: target.name });
     if (social.outgoing.some((r) => r.to === target.uid)) return say('friends.alreadySent', { name: target.name });
+    const theirs = social.incoming.find((r) => r.from === target.uid); // they already asked: just accept
+    if (theirs) { await cloud.acceptRequest(theirs); const f = $('friendsBody').querySelector('input[name=q]'); if (f) f.value = ''; return say('friends.nowFriends', { name: target.name }, 'ok'); }
     const res = await cloud.sendRequest(target, user.name, user.code);
     const fresh = $('friendsBody').querySelector('input[name=q]'); if (fresh) fresh.value = ''; // the list may have re-rendered meanwhile
     say(res === 'accepted' ? 'friends.nowFriends' : 'friends.sent', { name: target.name }, 'ok');
-  } catch (err) { say('acc.err.generic'); }
+  } catch (err) { console.error('add friend failed', err); say(err && err.code === 'permission-denied' ? 'friends.errPerm' : err && err.code === 'unavailable' ? 'acc.err.net' : 'acc.err.generic'); }
 }
 
 async function onFriendsClick(e) {
@@ -250,5 +267,5 @@ async function onFriendsClick(e) {
       const f = social.friends.find((x) => x.uid === id);
       if (f) H.visit({ name: (f.profile && f.profile.name) || f.name, totalMin: (f.profile && f.profile.totalMin) || 0 });
     }
-  } catch (err) { fmsg = { k: 'acc.err.generic', opts: null, kind: 'err' }; renderFriends(); }
+  } catch (err) { console.error('friend action failed', err); fmsg = { k: err && err.code === 'permission-denied' ? 'friends.errPerm' : 'acc.err.generic', opts: null, kind: 'err' }; renderFriends(); }
 }

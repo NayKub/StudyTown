@@ -47,10 +47,14 @@ export const fmtCode = (c) => (c ? c.slice(0, 3) + '-' + c.slice(3) : '');
 const normEmail = (s) => String(s || '').trim().toLowerCase();
 
 const me = () => auth && auth.currentUser;
-const userInfo = (u, extra = {}) => (u ? { uid: u.uid, email: u.email, name: u.displayName || '', verified: u.emailVerified, ...extra } : null);
+let authCb = null;
+let pendingName = '';        // display name typed at sign-up, before Firebase has stored it
+const profileJobs = {};      // uid -> promise, so the profile is only created once
+const userInfo = (u, extra = {}) => (u ? { uid: u.uid, email: u.email, name: u.displayName || pendingName || (u.email || '').split('@')[0], verified: u.emailVerified, ...extra } : null);
 
 /** Call once. cb(user|null) runs now and on every sign-in / sign-out. */
 export function init(cb, lang) {
+  authCb = cb;
   if (!isConfigured) { cb(null); return; }
   boot();
   if (lang) auth.languageCode = lang;
@@ -64,11 +68,15 @@ export function init(cb, lang) {
 export function setLanguage(lang) { if (auth) auth.languageCode = lang; }
 
 /** Makes sure profile, friend code and email lookup exist (repairs a half-finished sign-up). Returns the code. */
-async function ensureProfile(u) {
+function ensureProfile(u) {
+  if (!profileJobs[u.uid]) profileJobs[u.uid] = createProfile(u).catch((e) => { delete profileJobs[u.uid]; throw e; });
+  return profileJobs[u.uid];
+}
+async function createProfile(u) {
   const pref = doc(db, 'profiles', u.uid);
   const snap = await getDoc(pref);
   if (snap.exists() && snap.data().code) return snap.data().code;
-  const name = u.displayName || (u.email || '').split('@')[0];
+  const name = pendingName || u.displayName || (u.email || '').split('@')[0];
   let code = '';
   for (let i = 0; i < 8 && !code; i++) {
     const c = newCode();
@@ -83,11 +91,16 @@ async function ensureProfile(u) {
 // ---------- auth ----------
 export async function signUp(name, email, password) {
   boot();
-  const cred = await createUserWithEmailAndPassword(auth, normEmail(email), password); // throws auth/email-already-in-use
-  await updateProfile(cred.user, { displayName: name.trim() });
-  sendEmailVerification(cred.user).catch(() => {});
-  const code = await ensureProfile(cred.user);
-  return userInfo(cred.user, { code });
+  pendingName = name.trim();
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, normEmail(email), password); // throws auth/email-already-in-use
+    await updateProfile(cred.user, { displayName: pendingName });
+    sendEmailVerification(cred.user).catch(() => {});
+    const code = await ensureProfile(cred.user);
+    const info = userInfo(cred.user, { code });
+    if (authCb) authCb(info); // the first auth event fired before the name was stored
+    return info;
+  } finally { pendingName = ''; }
 }
 export async function logIn(email, password) { boot(); await signInWithEmailAndPassword(auth, normEmail(email), password); }
 export function logOut() { return signOut(auth); }
@@ -110,8 +123,8 @@ export async function deleteAccount(password, code) {
   batch.delete(doc(db, 'backups', uid));
   batch.delete(doc(db, 'profiles', uid));
   if (code) batch.delete(doc(db, 'codes', code));
-  if (u.email) batch.delete(doc(db, 'emails', normEmail(u.email)));
   await batch.commit();
+  if (u.email) await deleteDoc(doc(db, 'emails', normEmail(u.email))).catch(() => {}); // may never have been created
   await deleteUser(u);
 }
 
@@ -125,6 +138,13 @@ export function pushBackup(state) {
   const u = me(); if (!u) return Promise.resolve();
   const { timer, ...rest } = state; // a half-finished session stays on the device
   return setDoc(doc(db, 'backups', u.uid), { state: JSON.stringify(rest), updatedAt: serverTimestamp() });
+}
+/** Live copy of the cloud backup, so two devices on the same account stay in step. Returns stop(). */
+export function watchBackup(cb) {
+  return onSnapshot(doc(db, 'backups', me().uid), (snap) => {
+    if (!snap.exists() || snap.metadata.hasPendingWrites) return; // ignore our own upload
+    try { cb(JSON.parse(snap.data().state)); } catch (e) { /* unreadable backup */ }
+  }, () => {});
 }
 export function pushStats(stats) {
   const u = me(); if (!u) return Promise.resolve();
@@ -153,11 +173,8 @@ export async function findUser(input) {
   return snap.exists() ? { uid: snap.data().uid, name: snap.data().name, code: c } : null;
 }
 
-/** Returns 'sent' | 'accepted' (they had already asked you) */
 export async function sendRequest(target, myName, myCode) {
   const uid = me().uid;
-  const theirs = await getDoc(doc(db, 'requests', `${target.uid}_${uid}`));
-  if (theirs.exists()) { await acceptRequest(theirs.data()); return 'accepted'; }
   await setDoc(doc(db, 'requests', `${uid}_${target.uid}`), {
     from: uid, to: target.uid, fromName: myName, fromCode: myCode, toName: target.name, toCode: target.code || '', createdAt: serverTimestamp(),
   });

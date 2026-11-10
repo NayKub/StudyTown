@@ -50,6 +50,17 @@ test('requests: only as yourself, visible to both sides only', async () => {
   await assertFails(setDoc(doc(as('alice'), 'requests/alice_alice'), req('alice', 'alice')));
   await assertSucceeds(getDocs(query(collection(as('bob'), 'requests'), where('to', '==', 'bob'))));
   await assertFails(getDoc(doc(as('carol'), 'requests/alice_bob')));
+  // looking up or deleting a request that does not exist must not error
+  await assertSucceeds(getDoc(doc(as('bob'), 'requests/bob_alice')));
+  await assertSucceeds(deleteDoc(doc(as('bob'), 'requests/bob_alice')));
+});
+
+test('own profile, backup and friend list are readable by the owner', async () => {
+  await assertSucceeds(getDoc(doc(as('alice'), 'profiles/alice')));
+  await assertSucceeds(getDoc(doc(as('alice'), 'backups/alice')));
+  await assertSucceeds(getDocs(collection(as('alice'), 'friends/alice/list')));
+  await assertSucceeds(setDoc(doc(as('alice'), 'profiles/alice'), { name: 'Alice', code: 'AAAAAA', totalMin: 0 }));
+  await assertSucceeds(setDoc(doc(as('alice'), 'profiles/alice'), { totalMin: 5, streak: 1 }, { merge: true }));
 });
 
 test('friendship only by accepting a request, either side can end it', async () => {

@@ -70,6 +70,7 @@ export async function deleteAccount(password) {
 }
 export async function pullBackup() { await wait(100); const b = S.backups[S.session]; return b ? JSON.parse(b) : null; }
 export async function pushBackup(state) { const { timer, ...rest } = state; S.backups[S.session] = JSON.stringify(rest); save(); }
+export function watchBackup() { return () => {}; }
 export async function pushStats(stats) { if (!S.session) return; Object.assign(S.profiles[S.session], stats); save(); }
 export async function renameMe(name) { const u = user(); u.name = name; S.profiles[u.uid].name = name; save(); fireAuth(); }
 
@@ -82,7 +83,6 @@ export async function findUser(input) {
 }
 export async function sendRequest(target, myName, myCode) {
   await wait(); const uid = S.session;
-  if (S.requests[`${target.uid}_${uid}`]) { await acceptRequest(S.requests[`${target.uid}_${uid}`]); return 'accepted'; }
   S.requests[`${uid}_${target.uid}`] = { from: uid, to: target.uid, fromName: myName, fromCode: myCode, toName: target.name, toCode: target.code || '' };
   save();
   if (target.uid === 'mint') setTimeout(() => { // Mint accepts after a moment so the flow can be seen end to end

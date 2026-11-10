@@ -24,7 +24,7 @@ service cloud.firestore {
         && code.size() == 6 && shortText(request.resource.data.name, 40);
       allow update: if signedIn() && resource.data.uid == request.auth.uid
         && request.resource.data.uid == request.auth.uid && shortText(request.resource.data.name, 40);
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
     }
 
     // Email -> uid, so friends can be added by exact email. Only your own address can be registered.
@@ -33,7 +33,7 @@ service cloud.firestore {
       allow list: if false;
       allow create, update: if signedIn() && request.auth.token.email == email
         && request.resource.data.uid == request.auth.uid && shortText(request.resource.data.name, 40);
-      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+      allow delete: if signedIn() && (resource == null || resource.data.uid == request.auth.uid);
     }
 
     // Cloud backup of the town and study log. Owner only.
@@ -43,7 +43,9 @@ service cloud.firestore {
 
     // Friend requests. Document id is "{from}_{to}".
     match /requests/{id} {
-      allow read: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      // "resource == null" lets a client check for a request that does not exist without an error
+      allow get: if signedIn() && (resource == null || resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow list: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
       allow create: if signedIn()
         && request.resource.data.from == request.auth.uid
         && request.resource.data.to is string
@@ -51,7 +53,7 @@ service cloud.firestore {
         && id == request.auth.uid + '_' + request.resource.data.to
         && !areFriends(request.auth.uid, request.resource.data.to)
         && shortText(request.resource.data.fromName, 40) && shortText(request.resource.data.toName, 40);
-      allow delete: if signedIn() && (resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow delete: if signedIn() && (resource == null || resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
     }
 
     // Friend lists. A friendship is created only by accepting an existing request,

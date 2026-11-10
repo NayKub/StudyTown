@@ -180,7 +180,8 @@
     "already": "{{name}} is already your friend.",
     "alreadySent": "You already sent {{name}} a request.",
     "sent": "Request sent to {{name}} 💌",
-    "nowFriends": "You and {{name}} are now friends 🎉"
+    "nowFriends": "You and {{name}} are now friends 🎉",
+    "errPerm": "Friends are not set up on the server yet (database rules)."
   },
   "acc": {
     "title": "👤 My account",
