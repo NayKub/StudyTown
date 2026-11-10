@@ -240,6 +240,7 @@ function frame(now){
   else if (dusk){ sky.addColorStop(0,'#ffb4a2'); sky.addColorStop(1,'#ffe5c4'); }
   else { sky.addColorStop(0,'#bfe6ff'); sky.addColorStop(1,'#eaf7ff'); }
   ctx.setTransform(1,0,0,1,0,0); ctx.fillStyle=sky; ctx.fillRect(0,0,cv.width,cv.height);
+  if (G.visit){ ctx.fillStyle='rgba(160,120,255,.22)'; ctx.fillRect(0,0,cv.width,cv.height); } // lavender sky = a friend's town
   if (night){ ctx.fillStyle='#fff'; for(const [x,y,t] of stars){ ctx.globalAlpha=0.4+0.6*Math.abs(Math.sin(now/900+t*9)); ctx.fillRect(x*cv.width,y*cv.height,2*DPR,2*DPR);} ctx.globalAlpha=1; }
   else { ctx.fillStyle='rgba(255,255,255,.85)'; for(let k=0;k<4;k++){ const x=((now/60000*(k+1)*0.6+k*0.27)%1.2-0.1)*W*DPR, y=(40+k*55)*DPR; ctx.beginPath(); ctx.ellipse(x,y,40*DPR,14*DPR,0,0,7); ctx.ellipse(x+26*DPR,y-8*DPR,24*DPR,14*DPR,0,0,7); ctx.fill(); } }
   // camera

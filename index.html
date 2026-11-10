@@ -17,6 +17,7 @@
     <button class="sheetHandle" id="sheetHandle" type="button" aria-expanded="false"><i></i><span id="sheetLabel"></span></button>
 
     <div class="card timerCard">
+      <div class="lockNote"><span data-i18n="visit.locked"></span></div>
       <div class="presets" id="presets"></div>
       <div class="ringwrap">
         <svg viewBox="0 0 200 200">
@@ -71,7 +72,7 @@
       <button class="round" id="logBtn" data-i18n-label="a11y.log">📅</button>
       <button class="round" id="settingsBtn" data-i18n-label="a11y.settings">⚙️</button>
     </div>
-    <div class="visitBar" id="visitBar" hidden><span id="visitText"></span><button class="chip on" id="visitBack" data-i18n="visit.back"></button></div>
+    <div class="visitBar" id="visitBar" hidden><span id="visitText"></span><span class="visitTimer" id="visitTimer" hidden></span><button class="chip" id="visitBack" data-i18n="visit.back"></button></div>
     <div class="sheetShade" id="sheetShade"></div>
     <div class="toasts" id="toasts"></div>
     <div class="hint" data-i18n="hint"></div>

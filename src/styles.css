@@ -167,9 +167,21 @@ canvas.drag{cursor:grabbing}
 .codeBox b{flex:1;font-size:22px;letter-spacing:2px}
 .danger{border-top:2px dashed var(--line);margin-top:16px;padding-top:6px;text-align:center}
 #accountModal .btn.ghost{width:100%;margin-top:6px}
-.visitBar{position:absolute;left:50%;top:70px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(255,253,249,.96);border:2px solid var(--pink);border-radius:16px;padding:6px 6px 6px 14px;font-weight:700;font-size:14px;z-index:2;white-space:nowrap;max-width:calc(100% - 24px)}
-.visitBar span{overflow:hidden;text-overflow:ellipsis}
+/* visiting a friend's town: lavender frame and banner, timer locked */
+.visitBar{position:absolute;left:12px;right:12px;top:66px;display:flex;align-items:center;gap:8px;background:#8f6fe0;color:#fff;border-radius:16px;padding:6px 6px 6px 14px;font-weight:700;font-size:14px;z-index:2;white-space:nowrap;box-shadow:0 4px 0 #6f52bd}
+.visitBar #visitText{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.visitTimer{background:rgba(255,255,255,.22);border-radius:99px;padding:3px 10px;font-variant-numeric:tabular-nums;font-size:13px}
+.visitTimer[hidden]{display:none}
+.visitBar .chip{border-color:#fff;color:#6f52bd;font-weight:700}
+body.visiting .stage{border-color:#8f6fe0;box-shadow:0 0 0 4px #d7c0ff,0 10px 30px rgba(120,80,60,.1)}
+body.visiting .badge{border-color:#b9a2f2}
+body.visiting .preview{display:none}
 body.visiting .toasts{top:118px}
+.timerCard{position:relative}
+.lockNote{display:none;position:absolute;inset:0;z-index:1;align-items:center;justify-content:center;text-align:center;padding:14px;font-weight:700;font-size:15px;color:#6f52bd}
+body.visiting .lockNote{display:flex}
+body.visiting .timerCard>*:not(.lockNote){opacity:.12;pointer-events:none}
+body.visiting .next{opacity:.45}
 .sheetHandle,.sheetShade{display:none}
 
 /* ---------- phone, portrait: town fills the screen, controls live in a bottom sheet ---------- */

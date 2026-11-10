@@ -152,7 +152,8 @@
   },
   "visit": {
     "title": "🏡 {{name}}'s town",
-    "back": "Back to mine"
+    "back": "Back to mine",
+    "locked": "🔒 The timer only works in your own town"
   },
   "friends": {
     "title": "👫 Friends",

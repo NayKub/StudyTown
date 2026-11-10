@@ -98,6 +98,7 @@ function chime() {
 function applyAwake() { native.setAwake(timer.running && G.settings.keepAwake); }
 
 $('startBtn').addEventListener('click', async () => {
+  if (G.visit) return; // the timer can only be used in your own town
   unlockAudio();
   if (timer.running) { // pause
     timer.before = elapsed(); timer.running = false; credit();
@@ -111,7 +112,7 @@ $('startBtn').addEventListener('click', async () => {
   applyAwake(); setPresetsDisabled(timer.active); renderTimer(); saveNow();
 });
 $('stopBtn').addEventListener('click', () => {
-  if (!timer.active) return;
+  if (!timer.active || G.visit) return;
   timer.before = elapsed(); timer.running = false; credit();
   endSession(false, Math.floor(timer.credited / 60));
 });
@@ -135,7 +136,7 @@ function endSession(done, m) {
     $('doneModal').classList.add('show');
   } else if (m > 0) toast(t('toast.saved', { m }));
 }
-$('doneOk').addEventListener('click', () => $('doneModal').classList.remove('show'));
+$('doneOk').addEventListener('click', () => { $('doneModal').classList.remove('show'); if (G.visit) endVisit(); });
 
 /** Move newly elapsed seconds into the saved totals. Safe to call any time. */
 function credit() {
@@ -164,6 +165,9 @@ function renderTimer() {
   $('status').textContent = t(!timer.active ? 'status.ready' : timer.running ? 'status.studying' : 'status.paused');
   $('startBtn').textContent = t(timer.running ? 'btn.pause' : timer.active ? 'btn.resume' : 'btn.start');
   document.title = timer.running ? text + ' • ' + t('app.title') : t('app.title');
+  const vt = $('visitTimer'); // while visiting, your own running session shows on the banner
+  vt.hidden = !(G.visit && timer.active);
+  if (!vt.hidden) vt.textContent = (timer.running ? '⏱ ' : '⏸ ') + text;
 }
 
 function streak() {
@@ -180,7 +184,7 @@ function refreshUI() {
   $('sBuild').textContent = $('aBuild').textContent = t('unit.pieces', { n: real.n });
   const shown = cityAt(curMin());
   const badge = $('badge');
-  badge.textContent = t('rank')[shown.rank];
+  badge.textContent = (G.visit ? G.visit.name + ' · ' : '') + t('rank')[shown.rank];
   const small = document.createElement('small'); small.textContent = t('badge.sub', { pop: shown.pop, n: shown.n });
   badge.appendChild(small);
   const nx = plots[real.n];
