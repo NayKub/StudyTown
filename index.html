@@ -17,6 +17,7 @@
     <button class="sheetHandle" id="sheetHandle" type="button" aria-expanded="false"><i></i><span id="sheetLabel"></span></button>
 
     <div class="card timerCard">
+      <div class="lockNote"><span data-i18n="visit.locked"></span></div>
       <div class="presets" id="presets"></div>
       <div class="ringwrap">
         <svg viewBox="0 0 200 200">
@@ -36,6 +37,29 @@
       <p><b data-i18n="next.label"></b> <span id="nextName">-</span></p>
       <div class="bar"><i id="nextBar" style="width:0%"></i></div>
       <p class="muted" id="nextLeft">-</p>
+    </div>
+
+    <div class="card goalCard">
+      <div class="goalTop">
+        <div class="goalRingWrap">
+          <svg viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="#f5e8da" stroke-width="8"/>
+            <circle id="goalRing" cx="32" cy="32" r="26" fill="none" stroke="url(#g)" stroke-width="8" stroke-linecap="round" stroke-dasharray="163.36" stroke-dashoffset="163.36"/>
+          </svg>
+          <span id="goalPct"></span>
+        </div>
+        <div class="goalInfo">
+          <b data-i18n="goal.title"></b>
+          <div id="goalText"></div>
+          <small id="goalStreak"></small>
+        </div>
+      </div>
+      <div class="row badgeHead">
+        <b data-i18n="ach.shelf"></b>
+        <button class="linkbtn" id="openBadges"><span id="badgeCount"></span> →</button>
+      </div>
+      <div class="badgeRow" id="badgeRow"></div>
+      <button class="btn ghost" id="replayBtn" data-i18n="replay.button"></button>
     </div>
 
     <div class="card week">
@@ -71,7 +95,9 @@
       <button class="round" id="logBtn" data-i18n-label="a11y.log">📅</button>
       <button class="round" id="settingsBtn" data-i18n-label="a11y.settings">⚙️</button>
     </div>
-    <div class="visitBar" id="visitBar" hidden><span id="visitText"></span><button class="chip on" id="visitBack" data-i18n="visit.back"></button></div>
+    <div class="visitBar" id="visitBar" hidden><span id="visitText"></span><span class="visitTimer" id="visitTimer" hidden></span><button class="chip" id="visitBack" data-i18n="visit.back"></button></div>
+    <div class="visitBar replayBar" id="replayBar" hidden><span id="replayText"></span><button class="chip" id="replayStop" data-i18n="replay.stop"></button></div>
+    <button class="buildChip" id="buildBtn" hidden></button>
     <div class="sheetShade" id="sheetShade"></div>
     <div class="toasts" id="toasts"></div>
     <div class="hint" data-i18n="hint"></div>
@@ -116,6 +142,28 @@
   </div>
 </div>
 
+<div class="modal sheet" id="buildModal">
+  <div class="card">
+    <div class="sheetHead">
+      <h2 data-i18n="build.title"></h2>
+      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+    </div>
+    <p class="fine" data-i18n="build.hint"></p>
+    <div class="buildCards" id="buildCards"></div>
+    <p class="fine center"><span id="buildLeft"></span> <button class="linkbtn" id="buildAuto" data-i18n="build.auto"></button></p>
+  </div>
+</div>
+
+<div class="modal sheet" id="badgesModal">
+  <div class="card">
+    <div class="sheetHead">
+      <h2 id="badgesTitle"></h2>
+      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+    </div>
+    <div class="badgeGrid" id="badgesBody"></div>
+  </div>
+</div>
+
 <div class="modal sheet" id="accountModal">
   <div class="card">
     <div class="sheetHead">
@@ -133,6 +181,7 @@
       <button class="round" data-close data-i18n-label="a11y.close">✕</button>
     </div>
     <div class="setRow"><span data-i18n="settings.language"></span><div class="tabs" id="langTabs"></div></div>
+    <div class="setRow"><span data-i18n="settings.goal"></span><div class="tabs" id="goalTabs"></div></div>
     <label class="setRow"><span data-i18n="settings.notify"></span><input type="checkbox" class="switch" data-setting="notify"></label>
     <label class="setRow"><span data-i18n="settings.sound"></span><input type="checkbox" class="switch" data-setting="sound"></label>
     <label class="setRow"><span data-i18n="settings.haptics"></span><input type="checkbox" class="switch" data-setting="haptics"></label>

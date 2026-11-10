@@ -6,7 +6,9 @@ async function read(key) {
   try {
     const { value } = await Preferences.get({ key });
     return value ? JSON.parse(value) : null;
-  } catch (e) { return null; }
+  } catch {
+    return null;
+  }
 }
 function write(key, obj) {
   return Preferences.set({ key, value: JSON.stringify(obj) }).catch(() => {});

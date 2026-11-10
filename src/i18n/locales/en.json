@@ -31,7 +31,8 @@
     "label": "🔨 Next building:",
     "left": "Study {{m}} more min to unlock",
     "doneName": "Town complete!",
-    "doneText": "You have built on every plot 🏙️"
+    "doneText": "You have built on every plot 🏙️",
+    "choice": "Your choice! 🔨"
   },
   "week": {
     "title": "📅 Last 7 days",
@@ -74,7 +75,9 @@
     "built": "🎉 Built: {{name}}!",
     "upgrade": "⬆️ Upgraded to {{name}}!",
     "rank": "🏅 Congrats! You now have a \"{{name}}\"",
-    "saved": "👏 {{m}} min added to your town"
+    "saved": "👏 {{m}} min added to your town",
+    "plotReady_one": "🔨 A new plot is ready. Choose what to build!",
+    "plotReady_other": "🔨 {{count}} new plots are ready. Choose what to build!"
   },
   "kind": {
     "hall": "Your first tent",
@@ -134,7 +137,8 @@
     "sound": "Sound when time is up",
     "haptics": "Vibrate on new buildings",
     "notify": "Notify when time is up",
-    "version": "Version {{v}}"
+    "version": "Version {{v}}",
+    "goal": "Daily goal"
   },
   "notif": {
     "title": "Time's up! 🎉",
@@ -152,7 +156,8 @@
   },
   "visit": {
     "title": "🏡 {{name}}'s town",
-    "back": "Back to mine"
+    "back": "Back to mine",
+    "locked": "🔒 The timer only works in your own town"
   },
   "friends": {
     "title": "👫 Friends",
@@ -229,5 +234,138 @@
     "syncDone": "Synced ☁️",
     "syncErrPerm": "Sync was refused by the server. The database rules in Firebase need to be published again.",
     "syncErrOther": "Sync failed ({{code}})."
+  },
+  "goal": {
+    "title": "Today's goal",
+    "progress": "{{m}} / {{goal}} min",
+    "streak_one": "🔥 {{count}}-day streak",
+    "streak_other": "🔥 {{count}}-day streak",
+    "hint": "A little every day adds up",
+    "reached": "🎯 Daily goal reached: {{m}} minutes!"
+  },
+  "replay": {
+    "button": "🎬 Watch my town grow",
+    "title": "🎬 {{time}}",
+    "stop": "Stop",
+    "done": "That was {{time}} of studying. Well done! 🎉",
+    "empty": "Study a little first, then watch your town grow 🌱"
+  },
+  "build": {
+    "chip_one": "🔨 Build ({{count}})",
+    "chip_other": "🔨 Build ({{count}})",
+    "title": "🔨 Choose what to build",
+    "hint": "A new plot is ready. Pick one; it will grow as you keep studying.",
+    "more_one": "{{count}} more plot is waiting",
+    "more_other": "{{count}} more plots are waiting",
+    "auto": "🎲 Surprise me for all",
+    "autoDone_one": "🎲 Built {{count}} surprise!",
+    "autoDone_other": "🎲 Built {{count}} surprises!"
+  },
+  "kind2": {
+    "house": "House",
+    "shop": "Shop",
+    "trees": "Trees",
+    "garden": "Flower garden",
+    "pond": "Pond"
+  },
+  "ach": {
+    "title": "Achievements",
+    "shelf": "🏆 Achievements",
+    "count": "{{n}} of {{total}}",
+    "none": "Your first badge is one study session away",
+    "unlocked": "🏅 Achievement: {{name}}",
+    "many": "🏅 {{count}} achievements unlocked!",
+    "first": {
+      "name": "First step",
+      "desc": "Finish your first study session"
+    },
+    "h1": {
+      "name": "One hour in",
+      "desc": "Study for 1 hour in total"
+    },
+    "h5": {
+      "name": "Bookworm",
+      "desc": "Study for 5 hours in total"
+    },
+    "h10": {
+      "name": "Scholar",
+      "desc": "Study for 10 hours in total"
+    },
+    "h25": {
+      "name": "Going far",
+      "desc": "Study for 25 hours in total"
+    },
+    "h50": {
+      "name": "Master of focus",
+      "desc": "Study for 50 hours in total"
+    },
+    "village": {
+      "name": "Village founder",
+      "desc": "Grow your town into a tiny village"
+    },
+    "town": {
+      "name": "Town mayor",
+      "desc": "Grow your town into a proper town"
+    },
+    "metro": {
+      "name": "Metropolis",
+      "desc": "Build on every plot"
+    },
+    "focus45": {
+      "name": "Deep focus",
+      "desc": "Study 45 minutes in one session"
+    },
+    "focus90": {
+      "name": "In the zone",
+      "desc": "Study 90 minutes in one session"
+    },
+    "goal1": {
+      "name": "Goal getter",
+      "desc": "Reach your daily goal"
+    },
+    "goal7": {
+      "name": "Seven wins",
+      "desc": "Reach your daily goal on 7 days"
+    },
+    "streak3": {
+      "name": "Warming up",
+      "desc": "Keep a 3-day streak"
+    },
+    "streak7": {
+      "name": "One week strong",
+      "desc": "Keep a 7-day streak"
+    },
+    "streak30": {
+      "name": "Unstoppable",
+      "desc": "Keep a 30-day streak"
+    },
+    "early": {
+      "name": "Early bird",
+      "desc": "Start a session before 7 am"
+    },
+    "night": {
+      "name": "Night owl",
+      "desc": "Start a session after 10 pm"
+    },
+    "builder": {
+      "name": "Builder",
+      "desc": "Choose what to build on a plot"
+    },
+    "architect": {
+      "name": "Architect",
+      "desc": "Choose 15 buildings yourself"
+    },
+    "replay": {
+      "name": "Director",
+      "desc": "Watch the time-lapse of your town"
+    },
+    "friend": {
+      "name": "Study buddy",
+      "desc": "Add a friend"
+    },
+    "visit": {
+      "name": "Good neighbour",
+      "desc": "Visit a friend's town"
+    }
   }
 }

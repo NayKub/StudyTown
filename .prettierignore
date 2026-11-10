@@ -1,0 +1,9 @@
+dist/
+dist-mock/
+android/
+ios/
+assets/
+node_modules/
+package-lock.json
+index.html
+src/i18n/locales/
