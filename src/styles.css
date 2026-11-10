@@ -70,8 +70,10 @@ h1{font-size:22px;margin:0;display:flex;align-items:center;gap:8px}
 .stage{flex:1;position:relative;border-radius:26px;overflow:hidden;border:2px solid var(--line);box-shadow:0 10px 30px rgba(120,80,60,.1);min-height:0;min-width:0}
 canvas{display:block;width:100%;height:100%;cursor:grab;touch-action:none}
 canvas.drag{cursor:grabbing}
-.badge{position:absolute;left:12px;top:12px;background:rgba(255,253,249,.92);border-radius:16px;padding:8px 14px;border:2px solid var(--line);font-weight:700;font-size:15px;max-width:calc(100% - 130px)}
-.badge small{display:block;font-weight:400;color:var(--soft);font-size:12px}
+.badge{position:absolute;left:12px;top:12px;background:rgba(255,253,249,.92);border-radius:16px;padding:8px 14px;border:2px solid var(--line);font-weight:700;font-size:15px;max-width:calc(100% - 190px);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.badge small{display:block;font-weight:400;color:var(--soft);font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.noCloud .badge{max-width:calc(100% - 136px)}
+@media (max-width:380px){.badge{padding:6px 10px;font-size:14px}.badge small{font-size:11px}.stageBtns{gap:6px}.round{width:40px;height:40px;font-size:16px}.badge{max-width:calc(100% - 170px)}}
 .stageBtns{position:absolute;right:12px;top:12px;display:flex;gap:8px}
 .previewTag{position:absolute;top:76px;left:12px;background:var(--blue);color:#fff;border-radius:12px;padding:6px 12px;font-weight:700;font-size:13px;display:none}
 .hint{position:absolute;left:12px;bottom:12px;font-size:12px;color:var(--soft);background:rgba(255,253,249,.8);padding:4px 10px;border-radius:10px}
