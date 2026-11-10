@@ -140,11 +140,11 @@ export function pushBackup(state) {
   return setDoc(doc(db, 'backups', u.uid), { state: JSON.stringify(rest), updatedAt: serverTimestamp() });
 }
 /** Live copy of the cloud backup, so two devices on the same account stay in step. Returns stop(). */
-export function watchBackup(cb) {
+export function watchBackup(cb, onError) {
   return onSnapshot(doc(db, 'backups', me().uid), (snap) => {
     if (!snap.exists() || snap.metadata.hasPendingWrites) return; // ignore our own upload
     try { cb(JSON.parse(snap.data().state)); } catch (e) { /* unreadable backup */ }
-  }, () => {});
+  }, (e) => { if (onError) onError(e); });
 }
 export function pushStats(stats) {
   const u = me(); if (!u) return Promise.resolve();

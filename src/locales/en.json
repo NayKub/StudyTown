@@ -223,6 +223,11 @@
       "name": "Please enter a display name.",
       "emailFirst": "Enter your email above first.",
       "generic": "Something went wrong. Please try again."
-    }
+    },
+    "syncOk": "Synced with your account at {{time}}",
+    "syncNow": "Sync now",
+    "syncDone": "Synced ☁️",
+    "syncErrPerm": "Sync was refused by the server. The database rules in Firebase need to be published again.",
+    "syncErrOther": "Sync failed ({{code}})."
   }
 }

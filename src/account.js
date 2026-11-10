@@ -47,12 +47,12 @@ async function onAuth(u) {
   if (u && u.uid === was) { renderAccount(); renderFriends(); return; } // same person, details refreshed
   if (stopSocial) { stopSocial(); stopSocial = null; }
   if (stopBackup) { stopBackup(); stopBackup = null; }
-  social = { incoming: [], outgoing: [], friends: [] }; pushedSig = '';
+  social = { incoming: [], outgoing: [], friends: [] }; pushedSig = ''; syncState = { status: 'busy', code: '', at: 0 };
   if (u) {
     stopSocial = cloud.watchSocial((s) => { social = s; renderFriends(); });
     await restoreAndSync();
     // keep listening: when another device on this account uploads, merge it in right away
-    if (user && user.uid === u.uid) stopBackup = cloud.watchBackup(onRemoteBackup);
+    if (user && user.uid === u.uid) stopBackup = cloud.watchBackup(onRemoteBackup, (e) => setSync('err', e));
   }
   renderAccount(); renderFriends();
 }
@@ -69,32 +69,49 @@ export function mergeStates(local, remote) {
   const sum = Object.values(days).reduce((a, b) => a + b, 0);
   return { ...local, days, sessions: sessions.slice(-2000), totalSec: Math.max(local.totalSec || 0, remote.totalSec || 0, sum) };
 }
-async function restoreAndSync() {
-  try {
-    const remote = await cloud.pullBackup();
-    if (remote) H.replaceState(mergeStates(H.getState(), remote));
-    await sync(true);
-  } catch (e) { console.error('restore failed', e); /* offline: the next sync will catch up */ }
+// Sync status shown in the account sheet, so a failure is visible instead of silent.
+let syncState = { status: 'busy', code: '', at: 0 }; // status: busy | ok | err
+function setSync(status, e) {
+  syncState = { status, code: status === 'err' ? ((e && e.code) || 'error') : '', at: Date.now() };
+  if (status === 'err') console.error('sync failed', e);
+  if ($('accountModal').classList.contains('show')) renderAccount();
 }
 const sig = (st) => `${st.totalSec}|${Object.keys(st.days || {}).length}|${(st.sessions || []).length}`;
+const pushKey = (st) => sig(st) + '|' + todayKey();
+
+/** Download the cloud copy, merge it with this device, upload the result. */
+async function restoreAndSync() {
+  setSync('busy');
+  try {
+    const remote = await cloud.pullBackup();
+    if (remote) {
+      const local = H.getState(); const merged = mergeStates(local, remote);
+      if (sig(merged) !== sig(local)) H.replaceState(merged);
+    }
+    const st = H.getState();
+    await Promise.all([cloud.pushBackup(st), cloud.pushStats(H.stats())]);
+    pushedSig = pushKey(st); lastSync = Date.now();
+    setSync('ok');
+  } catch (e) { setSync('err', e); }
+}
 function onRemoteBackup(remote) {
   const local = H.getState(); const merged = mergeStates(local, remote);
-  if (sig(merged) !== sig(local) || merged.totalSec !== local.totalSec) H.replaceState(merged); // the other device had something new
-  if (sig(merged) !== sig(remote)) sync(true);                                                  // this device had something new
-  else pushedSig = sig(merged);
+  if (sig(merged) !== sig(local)) H.replaceState(merged); // the other device had something new
+  if (sig(merged) !== sig(remote)) sync(true);            // this device had something new
+  else { pushedSig = pushKey(merged); setSync('ok'); }
 }
 /** Upload backup + public stats. Skipped when nothing changed; throttled to once a minute unless forced. */
 export function sync(force) {
   if (!user) return Promise.resolve();
-  const st = H.getState(); const now = sig(st) + '|' + todayKey();
+  const st = H.getState(); const now = pushKey(st);
   if (now === pushedSig) return Promise.resolve();
   if (!force && Date.now() - lastSync < 60000) return Promise.resolve();
   if (syncing) return syncing;
   lastSync = Date.now();
   syncing = Promise.all([cloud.pushBackup(st), cloud.pushStats(H.stats())])
-    .then(() => { pushedSig = now; })
-    .catch((e) => { lastSync = 0; console.error('sync failed', e); })
-    .finally(() => { syncing = null; renderAccount(); });
+    .then(() => { pushedSig = now; setSync('ok'); })
+    .catch((e) => { lastSync = 0; setSync('err', e); })
+    .finally(() => { syncing = null; });
   return syncing;
 }
 
@@ -131,7 +148,10 @@ function renderAccount() {
     <div class="me">${avatar(user.name, user.uid)}<div><b>${esc(user.name)}</b><small>${esc(user.email)}</small></div></div>
     ${verify}
     <div class="codeBox"><small>${t('friends.myCode')}</small><b>${cloud.fmtCode(user.code)}</b><button class="chip" data-act="copyCode">${t('friends.copy')}</button></div>
-    <p class="fine">☁️ ${lastSync ? t('acc.synced') : t('acc.syncing')}</p>
+    ${syncState.status === 'err'
+      ? `<div class="warnBox">⚠️ ${t(syncState.code === 'permission-denied' ? 'acc.syncErrPerm' : syncState.code === 'unavailable' ? 'acc.err.net' : 'acc.syncErrOther', { code: esc(syncState.code) })}</div>`
+      : `<p class="fine">☁️ ${syncState.status === 'ok' ? t('acc.syncOk', { time: new Date(syncState.at).toLocaleTimeString(lang() === 'th' ? 'th-TH' : 'en-US', { hour: '2-digit', minute: '2-digit' }) }) : t('acc.syncing')}</p>`}
+    <button class="btn ghost" data-act="syncNow" ${busy ? 'disabled' : ''}>🔄 ${t('acc.syncNow')}</button>
     ${note}
     <button class="btn ghost" data-act="logout">${t('acc.logout')}</button>
     <div class="danger">
@@ -183,6 +203,7 @@ function onAccountClick(e) {
   } else if (act === 'resend') run(async () => { await cloud.resendVerification(); msg = { text: t('acc.verifySent'), kind: 'ok' }; });
   else if (act === 'checkVerified') run(async () => { const u = await cloud.refreshUser(); user = { ...user, verified: u.verified }; msg = u.verified ? { text: '', kind: '' } : { text: t('acc.stillNot'), kind: 'err' }; });
   else if (act === 'copyCode') copy(cloud.fmtCode(user.code));
+  else if (act === 'syncNow') run(async () => { await restoreAndSync(); if (syncState.status === 'ok') H.toast(t('acc.syncDone')); })
   else if (act === 'logout') run(async () => { await sync(true); await cloud.logOut(); $('accountModal').classList.remove('show'); H.toast(t('acc.bye')); });
   else if (act === 'delete') { showDelete = true; msg = { text: '', kind: '' }; renderAccount(); }
   else if (act === 'cancelDelete') { showDelete = false; renderAccount(); }
