@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+<g transform="translate(0,-140)">
+  <!-- island -->
+  <polygon points="512,560 872,740 512,920 152,740" fill="#9bdc8e"/>
+  <polygon points="152,740 512,920 512,990 152,810" fill="#c99a6e"/>
+  <polygon points="512,920 872,740 872,810 512,990" fill="#a97c55"/>
+  <polygon points="152,740 512,920 512,936 152,756" fill="#86cf78"/>
+  <polygon points="512,920 872,740 872,756 512,936" fill="#74b866"/>
+  <!-- house -->
+  <polygon points="330,560 500,645 500,805 330,720" fill="#ffc9d6"/>
+  <polygon points="500,645 670,560 670,720 500,805" fill="#f2a3b8"/>
+  <polygon points="300,570 500,670 500,400" fill="#7fa8ff"/>
+  <polygon points="500,670 700,570 500,400" fill="#6388dd"/>
+  <polygon points="392,655 440,679 440,775 392,751" fill="#a8754f"/>
+  <polygon points="550,668 620,633 620,703 550,738" fill="#ffe48a"/>
+  <!-- tree -->
+  <ellipse cx="770" cy="760" rx="46" ry="20" fill="#000" opacity=".12"/>
+  <rect x="758" y="680" width="24" height="80" fill="#a8754f"/>
+  <circle cx="770" cy="640" r="70" fill="#5fbf6e"/>
+  <circle cx="746" cy="616" r="22" fill="#fff" opacity=".35"/>
+  <!-- bunny -->
+  <ellipse cx="300" cy="842" rx="62" ry="24" fill="#000" opacity=".15"/>
+  <g stroke="#b99aa8" stroke-width="8">
+    <ellipse cx="268" cy="650" rx="24" ry="62" fill="#fff4f8" transform="rotate(-10 268 650)"/>
+    <ellipse cx="332" cy="650" rx="24" ry="62" fill="#fff4f8" transform="rotate(10 332 650)"/>
+    <ellipse cx="300" cy="760" rx="84" ry="80" fill="#fff4f8"/>
+  </g>
+  <ellipse cx="268" cy="652" rx="9" ry="38" fill="#ffc4d6" transform="rotate(-10 268 652)"/>
+  <ellipse cx="332" cy="652" rx="9" ry="38" fill="#ffc4d6" transform="rotate(10 332 652)"/>
+  <circle cx="272" cy="750" r="13" fill="#3b2f40"/><circle cx="332" cy="750" r="13" fill="#3b2f40"/>
+  <circle cx="277" cy="745" r="4.5" fill="#fff"/><circle cx="337" cy="745" r="4.5" fill="#fff"/>
+  <circle cx="246" cy="786" r="17" fill="#ff82a0" opacity=".55"/><circle cx="358" cy="786" r="17" fill="#ff82a0" opacity=".55"/>
+  <path d="M286 778 q8 12 16 0 q8 12 16 0" fill="none" stroke="#3b2f40" stroke-width="7" stroke-linecap="round"/>
+  <!-- sparkle -->
+  <path d="M760 330 l16 44 44 16 -44 16 -16 44 -16 -44 -44 -16 44 -16z" fill="#ffd36e"/>
+  <path d="M250 420 l10 26 26 10 -26 10 -10 26 -10 -26 -26 -10 26 -10z" fill="#ff8fab"/>
+</g>
+</svg>

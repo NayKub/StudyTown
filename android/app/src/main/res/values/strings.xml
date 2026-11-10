@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">My Little Town</string>
+    <string name="title_activity_main">My Little Town</string>
+    <string name="package_name">com.example.studytown</string>
+    <string name="custom_url_scheme">com.example.studytown</string>
+</resources>

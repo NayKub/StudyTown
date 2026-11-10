@@ -1,0 +1,30 @@
+{
+  "app": { "title": "My Little Town", "tagline": "The more you study, the bigger your town grows." },
+  "unit": { "min": "{{m}} min", "hm": "{{h}}h {{m}}m", "h": "{{h}} h", "days_one": "{{count}} day", "days_other": "{{count}} days", "pieces": "{{n}}", "minShort": "{{m}}m" },
+  "custom": { "or": "or", "placeholder": "min" },
+  "status": { "ready": "Ready to study", "studying": "Studying… keep going ✨", "paused": "Paused" },
+  "btn": { "start": "▶ Start", "pause": "❚❚ Pause", "resume": "▶ Resume", "stop": "■ End" },
+  "next": { "label": "🔨 Next building:", "left": "Study {{m}} more min to unlock", "doneName": "Town complete!", "doneText": "You have built on every plot 🏙️" },
+  "week": { "title": "📅 Last 7 days", "open": "Full log →", "today": "Today" },
+  "stats": { "total": "Total studied", "today": "Today", "streak": "Streak", "buildings": "Buildings", "saved": "💾 Saved on this device" },
+  "badge": { "sub": "Residents {{pop}} · Buildings {{n}}" },
+  "preview": { "tag": "👀 Peeking at the future", "label": "Peek ahead", "off": "Not while studying 📚" },
+  "hint": "Drag to move · Zoom · Double-tap to recentre",
+  "done": { "title": "Well done!", "text": "You studied for {{m}} min and your town grew again 🏗️", "ok": "See my town" },
+  "log": { "title": "📅 Study log", "range": "{{n}} days", "total": "Total in range", "avg": "Daily average", "best": "Best day", "daily": "By day", "today": "Today", "empty": "No records yet. Start your first session ✏️", "minutes": "{{m}} min" },
+  "toast": { "built": "🎉 Built: {{name}}!", "upgrade": "⬆️ Upgraded to {{name}}!", "rank": "🏅 Congrats! You now have a \"{{name}}\"", "saved": "👏 {{m}} min added to your town" },
+  "kind": { "hall": "Your first tent", "trees": "Trees", "garden": "Flower garden", "shop": "Little shop", "pond": "Pond", "house": "New house" },
+  "up": {
+    "hall": ["Tent", "First house", "Town hall", "Clock tower"],
+    "house": ["Small house", "Two-storey house", "Apartment", "Tower"],
+    "shop": ["Market stall", "Shop", "Small mall"],
+    "trees": ["Tree", "Grove", "Little forest"],
+    "garden": ["Flower garden", "Park", "Fountain garden"],
+    "pond": ["Pond"]
+  },
+  "rank": ["Empty land", "Little camp", "Tiny village", "Cute township", "Small town", "Town", "City", "Metropolis"],
+  "sign": "Start here!",
+  "settings": { "title": "⚙️ Settings", "language": "Language", "keepAwake": "Keep screen on while studying", "sound": "Sound when time is up", "haptics": "Vibrate on new buildings", "notify": "Notify when time is up", "version": "Version {{v}}" },
+  "notif": { "title": "Time's up! 🎉", "body": "You studied for {{m}} min. Come and see your town." },
+  "a11y": { "log": "Study log", "settings": "Settings", "close": "Close" }
+}
