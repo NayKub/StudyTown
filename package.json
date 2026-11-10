@@ -13,7 +13,12 @@
     "assets": "capacitor-assets generate --ios --android --iconBackgroundColor '#bfe6ff' --iconBackgroundColorDark '#2b2d5c' --splashBackgroundColor '#fdf3e7' --splashBackgroundColorDark '#2b2d5c'",
     "dev:mock": "VITE_CLOUD_MOCK=1 vite",
     "build:mock": "VITE_CLOUD_MOCK=1 vite build --outDir dist-mock",
-    "test:rules": "firebase emulators:exec --only firestore --project demo-studytown 'node --test tests/rules.test.mjs'"
+    "test:rules": "firebase emulators:exec --only firestore --project demo-studytown 'node --test tests/rules.test.mjs'",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run tests/unit",
+    "check": "npm run lint && npm run format:check && npm test && npm run build"
   },
   "dependencies": {
     "@capacitor-community/keep-awake": "^8.0.1",
@@ -32,8 +37,13 @@
   "devDependencies": {
     "@capacitor/assets": "^4.0.0",
     "@capacitor/cli": "^8.6.0",
+    "@eslint/js": "^10.0.1",
     "@firebase/rules-unit-testing": "^6.0.0",
+    "eslint": "^10.14.0",
     "firebase-tools": "^15.35.0",
-    "vite": "^8.3.7"
+    "globals": "^17.14.0",
+    "prettier": "^3.9.10",
+    "vite": "^8.3.7",
+    "vitest": "^5.1.0"
   }
 }

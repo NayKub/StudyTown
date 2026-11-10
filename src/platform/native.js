@@ -9,24 +9,31 @@ export const isNative = Capacitor.isNativePlatform();
 const NOTIF_ID = 1;
 const quiet = (p) => Promise.resolve(p).catch(() => {});
 
-export function hideSplash() { if (isNative) quiet(SplashScreen.hide()); }
+export function hideSplash() {
+  if (isNative) quiet(SplashScreen.hide());
+}
 
 /** Ask once, on a user tap, so the "time's up" notification can be shown later. */
 export async function ensureNotifyPermission() {
   if (!isNative) return false;
   try {
     let p = await LocalNotifications.checkPermissions();
-    if (p.display === 'prompt' || p.display === 'prompt-with-rationale') p = await LocalNotifications.requestPermissions();
+    if (p.display === 'prompt' || p.display === 'prompt-with-rationale')
+      p = await LocalNotifications.requestPermissions();
     return p.display === 'granted';
-  } catch (e) { return false; }
+  } catch {
+    return false;
+  }
 }
 
 export async function scheduleDone(at, title, body) {
   if (!isNative) return;
   await cancelDone();
-  await quiet(LocalNotifications.schedule({
-    notifications: [{ id: NOTIF_ID, title, body, schedule: { at, allowWhileIdle: true } }],
-  }));
+  await quiet(
+    LocalNotifications.schedule({
+      notifications: [{ id: NOTIF_ID, title, body, schedule: { at, allowWhileIdle: true } }],
+    }),
+  );
 }
 export function cancelDone() {
   if (!isNative) return Promise.resolve();

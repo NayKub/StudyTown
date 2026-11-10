@@ -1,10 +1,13 @@
 // The town plan: which plot gets built at how many total study minutes.
 // Pure data and functions, no drawing and no DOM.
-export const TW = 64, TH = 32, MAXR = 10;
+export const TW = 64,
+  TH = 32,
+  MAXR = 10;
 
 export function hash(x, y, s = 0) {
   let h = Math.imul(x + 1013, 374761393) ^ Math.imul(y + 7919, 668265263) ^ Math.imul(s + 31, 2246822519);
-  h = Math.imul(h ^ (h >>> 13), 1274126177); h ^= h >>> 16;
+  h = Math.imul(h ^ (h >>> 13), 1274126177);
+  h ^= h >>> 16;
   return (h >>> 0) / 4294967296;
 }
 export const isRoad = (x, y) => ((x % 4) + 4) % 4 === 2 || ((y % 4) + 4) % 4 === 2;
@@ -25,16 +28,23 @@ plots.forEach((p, i) => {
   else if (r < 0.2) p.kind = 'trees';
   else if (r < 0.27) p.kind = 'garden';
   else if (r < 0.36) p.kind = 'shop';
-  else if (r < 0.40) p.kind = 'pond';
+  else if (r < 0.4) p.kind = 'pond';
   else p.kind = 'house';
   p.color = COLORS[Math.floor(hash(p.x, p.y, 11) * COLORS.length)];
   p.roof = ROOFS[Math.floor(hash(p.x, p.y, 13) * ROOFS.length)];
-  p.cap = p.kind === 'hall' ? 3
-    : p.kind === 'house' ? Math.max(1, 3 - Math.floor((ring(p.x, p.y) - 1) / 3))
-    : p.kind === 'pond' ? 0 : 2;
+  p.cap =
+    p.kind === 'hall'
+      ? 3
+      : p.kind === 'house'
+        ? Math.max(1, 3 - Math.floor((ring(p.x, p.y) - 1) / 3))
+        : p.kind === 'pond'
+          ? 0
+          : 2;
 });
 export const plotAt = {};
-plots.forEach((p) => { plotAt[p.x + ',' + p.y] = p; });
+plots.forEach((p) => {
+  plotAt[p.x + ',' + p.y] = p;
+});
 
 const TIER_AGE = [0, 45, 180, 480]; // minutes after being built before each upgrade
 export function tierOf(p, minutes) {
@@ -52,6 +62,8 @@ export function cityAt(minutes) {
   for (let i = 0; i < n; i++) maxRing = Math.max(maxRing, ring(plots[i].x, plots[i].y));
   const R = n === 0 ? 1 : Math.min(MAXR, maxRing + 1);
   let rank = 0;
-  RANK_AT.forEach((k, i) => { if (n >= k) rank = i; });
+  RANK_AT.forEach((k, i) => {
+    if (n >= k) rank = i;
+  });
   return { n, R, rank, pop: Math.min(36, 1 + Math.floor(n * 0.55)) };
 }

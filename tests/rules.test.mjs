@@ -33,7 +33,9 @@ test('codes and emails: exact get only, no listing, no hijacking', async () => {
   await assertFails(setDoc(doc(as('bob'), 'codes/ABC234'), { uid: 'bob', name: 'Bob' }));
   await assertSucceeds(getDoc(doc(as('bob'), 'codes/ABC234')));
   await assertFails(getDocs(collection(as('bob'), 'codes')));
-  await assertSucceeds(setDoc(doc(as('alice', 'alice@test.com'), 'emails/alice@test.com'), { uid: 'alice', name: 'Alice' }));
+  await assertSucceeds(
+    setDoc(doc(as('alice', 'alice@test.com'), 'emails/alice@test.com'), { uid: 'alice', name: 'Alice' }),
+  );
   await assertFails(setDoc(doc(as('bob', 'bob@test.com'), 'emails/carol@test.com'), { uid: 'bob', name: 'Bob' }));
   await assertFails(getDocs(collection(as('bob'), 'emails')));
 });
@@ -74,7 +76,8 @@ test('friendship only by accepting a request, either side can end it', async () 
   // the sender cannot accept their own request
   await assertFails(setDoc(doc(as('alice'), 'friends/bob/list/alice'), { name: 'Alice' }));
   // the receiver accepts in one batch
-  const db = as('bob'); const b = writeBatch(db);
+  const db = as('bob');
+  const b = writeBatch(db);
   b.set(doc(db, 'friends/bob/list/alice'), { name: 'Alice' });
   b.set(doc(db, 'friends/alice/list/bob'), { name: 'Bob' });
   b.delete(doc(db, 'requests/alice_bob'));

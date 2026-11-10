@@ -28,13 +28,20 @@ export async function setLang(l) {
 /** Fill every element marked with data-i18n / data-i18n-ph / data-i18n-label. */
 export function applyI18n() {
   document.documentElement.lang = i18next.language;
-  document.querySelectorAll('[data-i18n]').forEach((el) => { el.textContent = t(el.dataset.i18n); });
-  document.querySelectorAll('[data-i18n-ph]').forEach((el) => { el.placeholder = t(el.dataset.i18nPh); });
-  document.querySelectorAll('[data-i18n-label]').forEach((el) => { el.setAttribute('aria-label', t(el.dataset.i18nLabel)); });
+  document.querySelectorAll('[data-i18n]').forEach((el) => {
+    el.textContent = t(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach((el) => {
+    el.placeholder = t(el.dataset.i18nPh);
+  });
+  document.querySelectorAll('[data-i18n-label]').forEach((el) => {
+    el.setAttribute('aria-label', t(el.dataset.i18nLabel));
+  });
 }
 
 export function fmtMin(m) {
   if (m < 60) return t('unit.min', { m });
-  const h = Math.floor(m / 60), r = m % 60;
+  const h = Math.floor(m / 60),
+    r = m % 60;
   return r ? t('unit.hm', { h, m: r }) : t('unit.h', { h });
 }
