@@ -52,4 +52,28 @@ describe('merging two devices', () => {
     const timer = { active: true };
     expect(mergeStates({ totalSec: 0, days: {}, timer }, { totalSec: 0, days: {} }).timer).toBe(timer);
   });
+
+  it('keeps the buildings chosen on both devices', () => {
+    const merged = mergeStates(
+      { totalSec: 0, days: {}, choices: { 3: 'pond' }, chooseFrom: 2 },
+      { totalSec: 0, days: {}, choices: { 4: 'shop' }, chooseFrom: 2 },
+    );
+    expect(merged.choices).toEqual({ 3: 'pond', 4: 'shop' });
+    expect(merged.chooseFrom).toBe(2);
+  });
+
+  it('does not tear up a town when a fresh install logs in to an old account', () => {
+    const freshInstall = { totalSec: 0, days: {}, choices: {}, chooseFrom: 1 };
+    const oldBackup = { totalSec: 600 * 60, days: { mon: 600 * 60 } }; // made before choosing existed
+    const merged = mergeStates(freshInstall, oldBackup);
+    expect(merged.chooseFrom).toBeGreaterThan(50);
+  });
+
+  it('keeps badges from both devices with the earliest date', () => {
+    const merged = mergeStates(
+      { totalSec: 0, days: {}, badges: { first: 200, h1: 300 } },
+      { totalSec: 0, days: {}, badges: { first: 100, early: 400 } },
+    );
+    expect(merged.badges).toEqual({ first: 100, h1: 300, early: 400 });
+  });
 });

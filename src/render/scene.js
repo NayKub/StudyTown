@@ -1,7 +1,7 @@
 // The frame loop: sky, ground, then buildings and residents sorted back to front.
 import { setCanvas, cv, ctx } from './canvas.js';
-import { curMin } from '../core/state.js';
-import { plots, cityAt } from '../core/city.js';
+import { curMin, shownTown } from '../core/state.js';
+import { plots, cityAt, kindOf } from '../core/city.js';
 import { t } from '../i18n/index.js';
 import { iso } from './primitives.js';
 import { applyCamera, bindCameraInput, resize } from './camera.js';
@@ -12,6 +12,8 @@ import { residents, setTown, syncResidents, updateResidents, drawResident } from
 
 export { resetView } from './camera.js';
 export { syncResidents } from './residents.js';
+export { paintSample } from './buildings.js';
+export { withContext } from './canvas.js';
 
 const MAX_FRAME_SEC = 0.05; // after a pause (tab hidden), don't let residents teleport
 
@@ -42,7 +44,8 @@ function frame(now) {
 
   const minutes = curMin();
   const city = cityAt(minutes);
-  setTown(city);
+  const buildings = shownTown();
+  setTown(city, buildings);
   syncResidents(false);
   updateResidents(dt);
 
@@ -56,7 +59,8 @@ function frame(now) {
   if (city.n === 0) things.push({ depth: 0, draw: drawStartSign });
   for (let i = 0; i < city.n; i++) {
     const p = plots[i];
-    things.push({ depth: p.x + p.y, draw: () => drawPlot(p, minutes, sky.night, now) });
+    const kind = kindOf(p, buildings);
+    things.push({ depth: p.x + p.y, draw: () => drawPlot(p, minutes, sky.night, now, kind) });
   }
   for (const c of residents) things.push({ depth: c.x + c.y + 0.3, draw: () => drawResident(c, now) });
   things.sort((a, b) => a.depth - b.depth).forEach((thing) => thing.draw());
@@ -68,7 +72,7 @@ export function startRender(canvas) {
   setCanvas(canvas);
   new ResizeObserver(resize).observe(cv);
   resize();
-  setTown(cityAt(curMin()));
+  setTown(cityAt(curMin()), shownTown());
   syncResidents(true);
   bindCameraInput();
   requestAnimationFrame(frame);

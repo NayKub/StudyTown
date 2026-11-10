@@ -5,7 +5,8 @@ import '@fontsource/mali/600.css';
 import '@fontsource/mali/700.css';
 import './styles.css';
 
-import { G } from './core/state.js';
+import { G, realMin } from './core/state.js';
+import { cityAt, encodeChoices } from './core/city.js';
 import { publicStats } from './core/dates.js';
 import { initI18n, applyI18n, t, detectLang } from './i18n/index.js';
 import { loadState, loadSettings } from './platform/storage.js';
@@ -20,6 +21,9 @@ import * as townView from './features/townView.js';
 import * as studyLog from './features/studyLog.js';
 import * as settings from './features/settings.js';
 import * as sheet from './features/bottomSheet.js';
+import * as build from './features/build.js';
+import * as achievements from './features/achievements.js';
+import { renderGoal } from './features/goal.js';
 import * as account from './features/account/index.js';
 
 const TICK_MS = 250;
@@ -36,6 +40,10 @@ function renderAll() {
   settings.renderSettings();
   sheet.renderSheetLabel();
   townView.renderVisitTitle();
+  renderGoal();
+  achievements.renderShelf();
+  build.renderBuildChip();
+  build.renderBuildTexts();
   studyLog.renderLogIfOpen();
 }
 
@@ -43,6 +51,8 @@ function tick() {
   timer.tickTimer();
   timer.renderTimer();
   renderHud();
+  renderGoal();
+  build.renderBuildChip();
   saveIfDue();
   account.sync(false);
   account.refresh(false);
@@ -57,7 +67,17 @@ function replaceState(merged) {
   renderHud();
   studyLog.renderWeek();
   studyLog.renderLogIfOpen();
+  achievements.renderShelf();
+  achievements.checkAchievements(); // another device may have brought study time that earns one
 }
+
+/** What friends can see: numbers, the buildings you chose, and how many badges you have. */
+const sharedProfile = () => ({
+  ...publicStats(G.state),
+  build: encodeChoices(G.state.choices),
+  from: G.state.chooseFrom,
+  badges: Object.keys(G.state.badges).length,
+});
 
 /** The app came to the front (true) or went to the background (false). */
 function onAppActive(active) {
@@ -98,6 +118,13 @@ async function loadSavedData() {
   // pick up a session that was still open when the app was closed
   const session = G.state.timer;
   if (session && session.active && session.dur > 0) Object.assign(G.timer, session);
+
+  // Towns from before "choose what to build" keep their buildings; only later plots wait for a choice.
+  if (G.state.chooseFrom == null) G.state.chooseFrom = Math.max(1, cityAt(realMin()).n);
+  for (const key of ['choices', 'badges', 'flags']) {
+    if (!G.state[key] || typeof G.state[key] !== 'object') G.state[key] = {};
+  }
+  G.state.v = 3;
 }
 
 async function boot() {
@@ -113,7 +140,14 @@ async function boot() {
       renderAll();
       account.onLanguageChange();
     },
+    onGoalChanged() {
+      renderGoal();
+      achievements.checkAchievements();
+      account.sync(true);
+    },
   });
+  build.initBuild({ onChoice: () => account.sync(true) });
+  achievements.initAchievements({ onNewBadge: () => account.sync(true) });
   bindSheetClosing();
 
   startRender($('cv'));
@@ -122,11 +156,13 @@ async function boot() {
   account.initAccount({
     getState: () => G.state,
     replaceState,
-    stats: () => publicStats(G.state),
+    stats: sharedProfile,
     visit: townView.startVisit,
+    onFriendsChange: achievements.checkAchievements,
   });
 
   timer.applyAwake();
+  achievements.checkAchievements();
   tick();
   setInterval(tick, TICK_MS);
   setInterval(() => {

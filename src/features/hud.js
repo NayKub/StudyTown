@@ -37,7 +37,8 @@ function renderNextBuilding(builtCount) {
   const previousAt = builtCount ? plots[builtCount - 1].t : 0;
   const secondsLeft = next.t * 60 - G.state.totalSec;
   const progress = ((G.state.totalSec / 60 - previousAt) / (next.t - previousAt)) * 100;
-  $('nextName').textContent = t('kind.' + next.kind);
+  const youChoose = G.state.chooseFrom != null && next.i >= G.state.chooseFrom;
+  $('nextName').textContent = youChoose ? t('next.choice') : t('kind.' + next.kind);
   $('nextBar').style.width = clamp(progress, 0, 100) + '%';
   $('nextLeft').textContent = t('next.left', { m: Math.max(1, Math.ceil(secondsLeft / 60)) });
 }

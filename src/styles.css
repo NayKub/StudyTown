@@ -1189,3 +1189,209 @@ body.visiting .next {
     display: none;
   }
 }
+
+/* ---------- daily goal, achievements, time-lapse, building ---------- */
+.goalTop {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.goalRingWrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  flex: none;
+}
+.goalRingWrap svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  display: block;
+}
+.goalRingWrap span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+.goalCard.reached .goalRingWrap span {
+  color: #3f8a3a;
+  font-size: 22px;
+}
+.goalInfo {
+  min-width: 0;
+}
+.goalInfo b {
+  display: block;
+  font-size: 14px;
+  color: var(--soft);
+  font-weight: 600;
+}
+.goalInfo #goalText {
+  font-size: 20px;
+  font-weight: 700;
+}
+.goalInfo small {
+  color: var(--soft);
+  font-size: 12px;
+}
+.badgeHead {
+  margin-top: 14px;
+  border-top: 2px dashed var(--line);
+  padding-top: 10px;
+}
+.badgeRow {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 4px 0 12px;
+  min-height: 40px;
+  align-items: center;
+}
+.badgeDot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #fff7ee;
+  border: 2px solid var(--yellow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.goalCard .btn {
+  width: 100%;
+}
+.badgeGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.badge2 {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: #f7f1ea;
+  border-radius: 14px;
+  padding: 10px;
+  opacity: 0.6;
+  min-width: 0;
+}
+.badge2.got {
+  background: #fff7ee;
+  border: 2px solid var(--yellow);
+  opacity: 1;
+}
+.badge2 .ico {
+  font-size: 26px;
+  flex: none;
+}
+.badge2 b {
+  display: block;
+  font-size: 13px;
+}
+.badge2 small {
+  display: block;
+  font-size: 11px;
+  color: var(--soft);
+}
+.badge2 .when {
+  color: var(--pinkd);
+}
+.fine.center {
+  text-align: center;
+}
+.buildChip {
+  position: absolute;
+  left: 50%;
+  bottom: 70px;
+  transform: translateX(-50%);
+  z-index: 2;
+  border: none;
+  border-radius: 99px;
+  padding: 10px 18px;
+  font-weight: 700;
+  font-size: 15px;
+  color: #fff;
+  background: var(--pink);
+  box-shadow: 0 4px 0 var(--pinkd);
+  cursor: pointer;
+  white-space: nowrap;
+  animation: nudge 1.6s ease-in-out infinite;
+}
+.buildChip[hidden] {
+  display: none;
+}
+@keyframes nudge {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+.buildCards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 10px 0;
+}
+.buildCard {
+  border: 2px solid var(--line);
+  background: #fff;
+  border-radius: 18px;
+  padding: 8px 4px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  box-shadow: 0 4px 0 var(--line);
+}
+.buildCard:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--line);
+  border-color: var(--pink);
+}
+.buildCard canvas {
+  max-width: 100%;
+  background: #eaf7ff;
+  border-radius: 12px;
+}
+.buildCard b {
+  font-size: 13px;
+  text-align: center;
+}
+.visitBar.replayBar {
+  background: var(--pink);
+  box-shadow: 0 4px 0 var(--pinkd);
+}
+.visitBar.replayBar #replayText {
+  flex: 1;
+  font-variant-numeric: tabular-nums;
+}
+.visitBar.replayBar .chip {
+  color: var(--pinkd);
+}
+body.replaying .preview {
+  display: none;
+}
+body.replaying .toasts {
+  top: 118px;
+}
+@media (max-width: 380px) {
+  .buildCards {
+    gap: 6px;
+  }
+  .badgeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+.linkbtn[hidden] {
+  display: none;
+}

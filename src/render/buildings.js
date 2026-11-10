@@ -187,7 +187,28 @@ function pond({ cx, cy, night, now, seed }) {
   ctx.fillRect(cx + Math.cos(swim) * 9 + 2, cy + Math.sin(swim) * 4 - 3, 2, 1.2);
 }
 
+/** An unlocked plot waiting for its owner to choose: bare earth, a striped barrier and a sign. */
+function buildingSite({ cx, cy, now }) {
+  poly(pts(cx - 22, cy, cx, cy + 11, cx + 22, cy, cx, cy - 11), '#e6cfa3');
+  for (const side of [-1, 1]) {
+    ctx.fillStyle = '#a8754f'; // barrier posts
+    ctx.fillRect(cx + side * 13 - 1, cy - 9, 2, 11);
+  }
+  for (let k = 0; k < 6; k++) {
+    ctx.fillStyle = k % 2 ? '#fff' : '#ffb347'; // striped bar
+    ctx.fillRect(cx - 13 + k * 4.4, cy - 9, 4.4, 4);
+  }
+  const bob = Math.sin(now / 300) * 1.5;
+  circle(cx, cy - 22 + bob, 7, '#ff8fab'); // "?" bubble
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 10px Mali, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('?', cx, cy - 18.5 + bob);
+  ctx.textAlign = 'start';
+}
+
 const PAINTERS = {
+  site: buildingSite,
   hall: (b) => HALL_TIERS[b.tier](b),
   house: (b) => HOUSE_TIERS[b.tier](b),
   shop,
@@ -212,10 +233,10 @@ function buildSparkle(cx, cy, k) {
   }
 }
 
-/** Draw one built plot. `minutes` decides its upgrade tier. */
-export function drawPlot(p, minutes, night, now) {
+/** Draw one unlocked plot as the given kind. `minutes` decides its upgrade tier. */
+export function drawPlot(p, minutes, night, now, kind = p.kind) {
   const [cx, cy] = iso(p.x, p.y);
-  const tier = tierOf(p, minutes);
+  const tier = tierOf(p, minutes, kind);
 
   // just built or upgraded: grow out of the ground with a little bounce
   const animStart = G.anims[p.i];
@@ -230,8 +251,14 @@ export function drawPlot(p, minutes, night, now) {
   ctx.translate(cx, cy);
   ctx.scale(1, grow);
   ctx.translate(-cx, -cy);
-  PAINTERS[p.kind]({ p, cx, cy, tier, night, now, seed: p.x * 31 + p.y });
+  PAINTERS[kind]({ p, cx, cy, tier, night, now, seed: p.x * 31 + p.y });
   ctx.restore();
 
   if (animStart && now - animStart < BUILD_ANIM_MS) buildSparkle(cx, cy, (now - animStart) / BUILD_ANIM_MS);
+}
+
+/** Paint what `kind` would look like on plot p, centred at (cx, cy), with no animation. */
+export function paintSample(p, kind, cx, cy) {
+  poly(pts(cx - 32, cy, cx, cy + 16, cx + 32, cy, cx, cy - 16), '#9bdc8e'); // a tile of grass to stand on
+  PAINTERS[kind]({ p, cx, cy, tier: 0, night: false, now: 0, seed: p.x * 31 + p.y });
 }

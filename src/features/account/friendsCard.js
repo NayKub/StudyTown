@@ -40,7 +40,8 @@ function statsLine(profile) {
   const today = profile.dayKey === todayKey() ? profile.todayMin || 0 : 0; // their "today" may be yesterday's
   const rank = t('rank')[cityAt(profile.totalMin || 0).rank];
   const streak = profile.streak ? ` · 🔥${profile.streak}` : '';
-  return `${rank} · ${t('friends.today', { m: today })}${streak}`;
+  const badges = profile.badges ? ` · 🏅${Number(profile.badges) || 0}` : '';
+  return `${rank} · ${t('friends.today', { m: today })}${streak}${badges}`;
 }
 
 const incomingRow = (r) => `
@@ -179,7 +180,14 @@ const ACTIONS = {
   },
   visit(id) {
     const friend = session.social.friends.find((f) => f.uid === id);
-    if (friend) session.hooks.visit({ name: nameOf(friend), totalMin: totalMinOf(friend) });
+    if (!friend) return;
+    const profile = friend.profile || {};
+    session.hooks.visit({
+      name: nameOf(friend),
+      totalMin: totalMinOf(friend),
+      build: profile.build,
+      from: profile.from,
+    });
   },
 };
 

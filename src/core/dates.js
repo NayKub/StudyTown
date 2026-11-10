@@ -20,17 +20,41 @@ export function lastDays(n, now = new Date()) {
 /** Whole minutes studied on a day. `days` maps dayKey -> seconds. */
 export const dayMin = (days, k) => Math.round((days[k] || 0) / 60);
 
-/** Consecutive days with at least a minute of study, counting back from today (or yesterday). */
+const STUDIED_SEC = 60; // a day counts once it has a minute of study
+const REST_DAYS_ALLOWED = 1; // missing this many days in a row does not end a streak
+
+/**
+ * Study days in the current streak. It is forgiving on purpose: one rest day between study days
+ * is fine, and today only counts against you once it is over.
+ */
 export function streak(days, now = new Date()) {
-  let n = 0;
+  const studied = (d) => days[todayKey(d)] >= STUDIED_SEC;
   const d = new Date(now);
-  if (!(days[todayKey(d)] >= 60)) d.setDate(d.getDate() - 1);
-  while (days[todayKey(d)] >= 60) {
-    n++;
+  if (!studied(d)) d.setDate(d.getDate() - 1);
+  let count = 0;
+  let missed = 0;
+  for (let guard = 0; guard < 5000 && missed <= REST_DAYS_ALLOWED; guard++) {
+    if (studied(d)) {
+      count++;
+      missed = 0;
+    } else {
+      missed++;
+    }
     d.setDate(d.getDate() - 1);
   }
-  return n;
+  return count;
 }
+
+/** Today against the daily goal: { minutes, goal, ratio (0..1), reached }. */
+export function goalProgress(state, now = new Date()) {
+  const goal = Math.max(1, state.goalMin || 60);
+  const minutes = Math.floor((state.days[todayKey(now)] || 0) / 60);
+  return { minutes, goal, ratio: Math.min(1, minutes / goal), reached: minutes >= goal };
+}
+
+/** How many days the current goal was reached. */
+export const goalDays = (state) =>
+  Object.values(state.days).filter((sec) => sec >= Math.max(1, state.goalMin || 60) * 60).length;
 
 export const weekMinutes = (days, now = new Date()) => lastDays(7, now).reduce((a, x) => a + dayMin(days, x.k), 0);
 

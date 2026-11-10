@@ -10,6 +10,10 @@ One codebase, three targets: web, Android and iOS, using [Capacitor](https://cap
 - Study timer (15 / 25 / 45 / 60 minutes or a custom length), pause and early finish
 - Town that grows and upgrades with total study time, with residents walking around
 - Daily study log with 7 / 14 / 30 day charts and per-session times
+- Choose what to build: each newly unlocked plot offers three kinds of building, so every town is different
+- Daily goal with a forgiving streak (one rest day does not break it)
+- 23 achievements with a trophy shelf
+- Time-lapse that replays your town growing from empty land to today
 - Thai and English (i18next), switchable in Settings
 - Works fully as a guest, with all data stored on the device
 - Optional account (Firebase): email sign-up and log-in, password reset, email verification,
@@ -31,6 +35,7 @@ src/
     city.js                town plan: what unlocks at how many minutes
     dates.js               day keys, streaks, weekly totals
     merge.js               merging two devices' study data
+    achievements.js        what each achievement is and when it is earned
   render/                  the canvas
     scene.js               frame loop, draws back to front
     camera.js              zoom-to-fit, pan, pinch, double-tap
@@ -42,8 +47,11 @@ src/
   features/                one file per thing the user can do
     timer.js               study timer
     growth.js              "new building" / "upgrade" / "new rank" detection
+    build.js               choosing what to build on a new plot
+    goal.js                daily goal ring and streak
+    achievements.js        earning badges, trophy shelf
     hud.js                 badge, stats tiles, next-building bar
-    townView.js            own town / peek ahead / visiting a friend
+    townView.js            own town / peek ahead / time-lapse / visiting a friend
     studyLog.js            weekly chart and full log
     settings.js            language and switches
     bottomSheet.js         phone bottom sheet

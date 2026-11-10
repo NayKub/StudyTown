@@ -5,6 +5,9 @@ import { $, showModal } from '../ui/dom.js';
 import { saveSettings } from '../platform/storage.js';
 import * as native from '../platform/native.js';
 import { applyAwake } from './timer.js';
+import { saveNow } from './persistence.js';
+
+const GOAL_OPTIONS_MIN = [15, 30, 60, 90, 120];
 
 const switches = () => document.querySelectorAll('[data-setting]');
 
@@ -12,6 +15,10 @@ export function renderSettings() {
   $('langTabs').innerHTML = Object.entries(LANGS)
     .map(([code, name]) => `<button class="chip${code === lang() ? ' on' : ''}" data-lang="${code}">${name}</button>`)
     .join('');
+  $('goalTabs').innerHTML = GOAL_OPTIONS_MIN.map(
+    (m) =>
+      `<button class="chip${m === G.state.goalMin ? ' on' : ''}" data-goal="${m}">${t('unit.min', { m })}</button>`,
+  ).join('');
   switches().forEach((el) => {
     el.checked = !!G.settings[el.dataset.setting];
   });
@@ -26,8 +33,19 @@ function onSwitchChange(el) {
   if (name === 'notify' && el.checked) native.ensureNotifyPermission();
 }
 
-/** onLanguageChanged runs after the new language is loaded, to redraw every text on screen. */
-export function initSettings({ onLanguageChanged }) {
+/**
+ * onLanguageChanged runs after the new language is loaded, to redraw every text on screen.
+ * onGoalChanged runs after the daily goal was changed.
+ */
+export function initSettings({ onLanguageChanged, onGoalChanged }) {
+  $('goalTabs').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    G.state.goalMin = +chip.dataset.goal; // part of the saved state, so it follows the account
+    saveNow();
+    renderSettings();
+    onGoalChanged();
+  });
   $('settingsBtn').addEventListener('click', () => {
     renderSettings();
     showModal('settingsModal');

@@ -2,7 +2,7 @@
 import { ctx } from './canvas.js';
 import { G, curMin } from '../core/state.js';
 import { clamp } from '../core/util.js';
-import { isRoad, ring, plotAt, cityAt } from '../core/city.js';
+import { isRoad, ring, plotAt, cityAt, kindOf } from '../core/city.js';
 import { iso, shade, pts } from './primitives.js';
 
 const SPECIES = ['bunny', 'cat', 'bear', 'chick', 'frog', 'pig'];
@@ -27,8 +27,10 @@ export let residents = [];
 // The town the residents currently live in. The scene updates it once per frame, so after
 // switching towns (peek ahead, visiting) they move in on the next frame.
 let town = cityAt(0);
-export function setTown(city) {
+let buildings = { choices: {}, chooseFrom: Infinity, unlocked: Infinity }; // whose buildings stand there
+export function setTown(city, shownBuildings) {
   town = city;
+  buildings = shownBuildings;
 }
 
 /** Residents walk on roads, empty land, and through parks. */
@@ -38,7 +40,8 @@ function walkable(x, y) {
   const p = plotAt[x + ',' + y];
   if (!p) return false;
   if (p.t > curMin()) return true; // not built yet
-  return p.kind === 'trees' || p.kind === 'garden';
+  const kind = kindOf(p, buildings);
+  return kind === 'trees' || kind === 'garden';
 }
 
 function randomWalkable() {

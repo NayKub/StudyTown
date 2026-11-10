@@ -7,3 +7,14 @@ export function setCanvas(canvas) {
   cv = canvas;
   ctx = canvas.getContext('2d');
 }
+
+/** Run `draw` against another canvas context (used for the small previews in the build chooser). */
+export function withContext(other, draw) {
+  const main = ctx;
+  ctx = other;
+  try {
+    draw();
+  } finally {
+    ctx = main;
+  }
+}

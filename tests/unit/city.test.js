@@ -1,5 +1,16 @@
 import { describe, it, expect } from 'vitest';
-import { plots, cityAt, tierOf, isRoad } from '../../src/core/city.js';
+import {
+  plots,
+  cityAt,
+  tierOf,
+  isRoad,
+  KINDS,
+  kindOf,
+  optionsFor,
+  pendingPlots,
+  encodeChoices,
+  decodeChoices,
+} from '../../src/core/city.js';
 
 describe('town plan', () => {
   it('starts as empty land with one resident', () => {
@@ -53,5 +64,56 @@ describe('upgrades', () => {
   it('never upgrades past what a plot allows', () => {
     plots.forEach((p) => expect(tierOf(p, 1e6)).toBe(p.cap));
     expect(plots.find((p) => p.kind === 'pond').cap).toBe(0);
+  });
+});
+
+describe('choosing what to build', () => {
+  const town = (over = {}) => ({ choices: {}, chooseFrom: 5, unlocked: 8, ...over });
+
+  it('keeps the planned kind for plots built before choosing existed', () => {
+    expect(kindOf(plots[3], town())).toBe(plots[3].kind);
+  });
+
+  it('shows a building site until the owner chooses', () => {
+    expect(kindOf(plots[6], town())).toBe('site');
+    expect(kindOf(plots[6], town({ choices: { 6: 'pond' } }))).toBe('pond');
+  });
+
+  it('never turns the hall or a locked plot into a site', () => {
+    expect(kindOf(plots[0], town({ chooseFrom: 0 }))).toBe('hall');
+    expect(kindOf(plots[9], town())).toBe(plots[9].kind);
+  });
+
+  it('lists the plots waiting for a choice, oldest first', () => {
+    expect(pendingPlots(town({ choices: { 6: 'shop' } }))).toEqual([5, 7]);
+    expect(pendingPlots(town({ chooseFrom: Infinity }))).toEqual([]);
+  });
+
+  it('offers three different kinds, the same ones every time', () => {
+    plots.slice(1, 40).forEach((p) => {
+      const options = optionsFor(p);
+      expect(new Set(options).size).toBe(3);
+      options.forEach((kind) => expect(KINDS).toContain(kind));
+      expect(optionsFor(p)).toEqual(options);
+    });
+  });
+
+  it('upgrades a chosen kind by that kind’s own limits', () => {
+    const p = plots[5];
+    expect(tierOf(p, 1e6, 'pond')).toBe(0);
+    expect(tierOf(p, 1e6, 'shop')).toBe(2);
+  });
+
+  it('round-trips choices through the short text friends receive', () => {
+    const choices = { 2: 'house', 5: 'pond', 6: 'trees' };
+    expect(encodeChoices(choices)).toBe('--h--pt');
+    expect(decodeChoices('--h--pt')).toEqual(choices);
+    expect(encodeChoices({})).toBe('');
+  });
+
+  it('ignores anything unexpected in text from other people', () => {
+    expect(decodeChoices('x<h>!')).toEqual({ 2: 'house' });
+    expect(decodeChoices(null)).toEqual({});
+    expect(Object.keys(decodeChoices('h'.repeat(5000))).length).toBe(plots.length);
   });
 });

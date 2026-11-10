@@ -12,7 +12,8 @@ import * as native from '../platform/native.js';
 import { markDirty, saveNow } from './persistence.js';
 import { checkGrowth } from './growth.js';
 import { chime, unlockAudio } from './audio.js';
-import { leavePreview, endVisit } from './townView.js';
+import { leaveLookOnlyViews, endVisit } from './townView.js';
+import { checkAchievements } from './achievements.js';
 import { renderWeek } from './studyLog.js';
 import { sync } from './account/index.js';
 
@@ -107,7 +108,7 @@ function startOrResume() {
   }
   timer.startedAt = Date.now();
   timer.running = true;
-  leavePreview();
+  leaveLookOnlyViews();
   if (G.settings.notify) native.ensureNotifyPermission();
 }
 
@@ -154,6 +155,7 @@ function endSession(completed, minutes) {
   saveNow();
   renderTimer();
   renderWeek();
+  checkAchievements(); // before the upload, so new badges go with it
   sync(true);
   if (completed) {
     chime();

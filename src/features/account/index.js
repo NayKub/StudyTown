@@ -12,7 +12,7 @@ export { sync, refresh } from './sync.js';
 
 let stopSocial = null; // stops the live friends listener
 
-/** hooks: { getState, replaceState(merged), stats(), visit({ name, totalMin }) } */
+/** hooks: { getState, replaceState(merged), stats(), visit(friend), onFriendsChange() } */
 export function initAccount(hooks) {
   session.hooks = hooks;
   if (!cloud.isConfigured) {
@@ -49,6 +49,7 @@ async function onAuthChange(user) {
       stopSocial = cloud.watchSocial((social) => {
         session.social = social;
         renderFriends();
+        session.hooks.onFriendsChange();
       });
       await restoreAndSync();
       // keep listening: when another device on this account uploads, merge it in right away

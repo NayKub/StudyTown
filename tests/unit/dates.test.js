@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { todayKey, lastDays, dayMin, streak, weekMinutes, publicStats } from '../../src/core/dates.js';
+import {
+  todayKey,
+  lastDays,
+  dayMin,
+  streak,
+  weekMinutes,
+  publicStats,
+  goalProgress,
+  goalDays,
+} from '../../src/core/dates.js';
 
 const NOW = new Date(2026, 10, 10, 15, 0); // 10 Nov 2026, 15:00 local time
 const MIN = 60;
@@ -35,9 +44,20 @@ describe('study statistics', () => {
     expect(dayMin({}, 'a')).toBe(0);
   });
 
-  it('counts a streak back from today', () => {
-    const days = { '2026-11-10': 5 * MIN, '2026-11-09': 30 * MIN, '2026-11-08': MIN, '2026-11-06': 90 * MIN };
+  it('counts study days back from today', () => {
+    const days = { '2026-11-10': 5 * MIN, '2026-11-09': 30 * MIN, '2026-11-08': MIN };
     expect(streak(days, NOW)).toBe(3);
+  });
+
+  it('forgives one rest day between study days', () => {
+    const days = { '2026-11-10': 5 * MIN, '2026-11-09': 30 * MIN, '2026-11-07': 90 * MIN };
+    expect(streak(days, NOW)).toBe(3);
+  });
+
+  it('ends after two rest days in a row', () => {
+    const days = { '2026-11-10': 5 * MIN, '2026-11-07': 90 * MIN, '2026-11-06': 90 * MIN };
+    expect(streak(days, NOW)).toBe(1);
+    expect(streak({ '2026-11-07': 90 * MIN }, NOW)).toBe(0);
   });
 
   it('keeps yesterday’s streak alive until today is studied', () => {
@@ -64,5 +84,22 @@ describe('study statistics', () => {
       weekMin: 62,
       streak: 2,
     });
+  });
+});
+
+describe('daily goal', () => {
+  it('reports progress towards the goal', () => {
+    const state = { goalMin: 60, days: { '2026-11-10': 15 * MIN } };
+    expect(goalProgress(state, NOW)).toEqual({ minutes: 15, goal: 60, ratio: 0.25, reached: false });
+  });
+
+  it('caps at the goal once reached', () => {
+    const state = { goalMin: 30, days: { '2026-11-10': 90 * MIN } };
+    expect(goalProgress(state, NOW)).toMatchObject({ ratio: 1, reached: true });
+  });
+
+  it('counts the days the goal was reached', () => {
+    const state = { goalMin: 30, days: { a: 30 * MIN, b: 29 * MIN, c: 120 * MIN } };
+    expect(goalDays(state)).toBe(2);
   });
 });
