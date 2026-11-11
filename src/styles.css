@@ -717,10 +717,6 @@ canvas.drag {
 .noCloud #accountBtn {
   display: none;
 }
-#accountBtn.in {
-  background: var(--surface);
-  border-color: var(--pink);
-}
 .friendsCard[hidden],
 .visitBar[hidden] {
   display: none;
@@ -1633,7 +1629,7 @@ img.avatar {
   height: 56px;
   font-size: 22px;
 }
-.avatar.btn {
+.avatar.fill {
   width: 100%;
   height: 100%;
   border: none;
@@ -1645,15 +1641,17 @@ img.avatar {
   overflow: visible;
 }
 #accountBtn.in {
-  padding: 0;
+  /* same frame as the other round buttons; the picture sits inside it */
+  padding: 2px;
+  overflow: visible;
 }
 #accountBtn.hasNews::after {
   content: '';
   position: absolute;
-  top: -1px;
-  right: -1px;
-  width: 12px;
-  height: 12px;
+  top: -2px;
+  right: -2px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: #ff4d6d;
   border: 2px solid var(--card);
@@ -1777,19 +1775,82 @@ body.fullClear.controls .fullBar {
   opacity: 1;
   pointer-events: auto;
 }
-.fullTime {
-  background: var(--glass);
-  border: 2px solid var(--line);
-  border-radius: 99px;
-  padding: 7px 14px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-.fullTime:empty {
+/* the running timer: a small ring in the top-left corner that stays while full clear is on */
+.fullRing {
   display: none;
 }
+body.fullClear .fullRing:not([hidden]) {
+  display: grid;
+  place-items: center;
+  position: absolute;
+  top: max(14px, var(--sat));
+  left: max(14px, var(--sal));
+  z-index: 3;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--glass);
+  box-shadow: var(--shadow);
+  pointer-events: none;
+}
+.fullRing svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+.frTrack,
+.frArc {
+  fill: none;
+  stroke-width: 5;
+}
+.frTrack {
+  stroke: var(--track);
+}
+.frArc {
+  stroke: url(#fullGrad);
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+.gStart {
+  stop-color: var(--pink);
+}
+.gEnd {
+  stop-color: var(--yellow);
+}
+.frTime {
+  position: relative;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.frTime.long {
+  font-size: 11px;
+}
+.fullRing.paused .frArc {
+  stroke: var(--soft);
+}
+.fullRing.paused .frTime {
+  color: var(--soft);
+}
+@media (min-width: 900px) {
+  body.fullClear .fullRing:not([hidden]) {
+    width: 76px;
+    height: 76px;
+    top: 20px;
+    left: 20px;
+  }
+  .frTime {
+    font-size: 15px;
+  }
+  .frTime.long {
+    font-size: 13px;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  body.fullClear .fullBar {
+  body.fullClear .fullBar,
+  .frArc {
     transition: none;
   }
 }

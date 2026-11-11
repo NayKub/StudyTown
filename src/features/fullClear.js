@@ -1,12 +1,15 @@
 // Full clear: the town fills the whole screen with everything else hidden, like a video player's
-// full-screen mode. A tap or a mouse move shows the exit button (and the timer, if one is running)
-// for a few seconds.
+// full-screen mode. A running timer stays as a small ring in the top-left corner; a tap or a mouse
+// move shows the exit button for a few seconds.
 import { G } from '../core/state.js';
 import { $ } from '../ui/dom.js';
 import * as native from '../platform/native.js';
 import { setSheet } from './bottomSheet.js';
+import { sessionProgress } from './timer.js';
 
 const CONTROLS_MS = 2500;
+const ARC_LENGTH = 169.65; // circumference of the ring in index.html (r = 27)
+let shown = { text: null, paused: null, offset: null };
 let hideTimer = 0;
 let usedBrowserFullscreen = false;
 
@@ -42,15 +45,33 @@ export function exitFullClear() {
   document.body.classList.remove('fullClear', 'controls');
   clearTimeout(hideTimer);
   native.setBarsHidden(false);
+  shown = { text: null, paused: null, offset: null };
   if (usedBrowserFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
   usedBrowserFullscreen = false;
 }
 
-/** The running timer, shown next to the exit button. Called on every tick. */
+/** The running timer's ring. Called on every tick. */
 export function renderFullTime() {
   if (!isFullClear()) return;
-  const text = G.timer.active ? $('clock').textContent : '';
-  if ($('fullTime').textContent !== text) $('fullTime').textContent = text;
+  const ring = $('fullRing');
+  ring.hidden = !G.timer.active;
+  if (!G.timer.active) return;
+  const text = $('clock').textContent;
+  if (shown.text !== text) {
+    $('fullTime').textContent = text;
+    $('fullTime').classList.toggle('long', text.length > 5);
+    shown.text = text;
+  }
+  const paused = !G.timer.running;
+  if (shown.paused !== paused) {
+    ring.classList.toggle('paused', paused);
+    shown.paused = paused;
+  }
+  const offset = (ARC_LENGTH * (1 - sessionProgress())).toFixed(2);
+  if (shown.offset !== offset) {
+    $('fullArc').setAttribute('stroke-dashoffset', offset);
+    shown.offset = offset;
+  }
 }
 
 export function initFullClear() {

@@ -201,6 +201,9 @@ export function sessionEndTime() {
 
 export const sessionMinutes = () => Math.round(timer.dur / 60);
 
+/** How much of the session is done, 0 to 1. */
+export const sessionProgress = () => (timer.active ? Math.min(elapsed(), timer.dur) / timer.dur : 0);
+
 /** Time left in the session as "mm:ss" (for the ongoing notification while paused). */
 export const remainingText = () => formatClock(Math.max(0, timer.dur - Math.min(elapsed(), timer.dur)));
 

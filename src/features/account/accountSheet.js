@@ -127,7 +127,7 @@ const myPicture = () => ({ name: session.user.name, uid: session.user.uid, ...G.
 let shownButton = '';
 /** The round profile button on the town: your picture once logged in, an outline figure before. */
 export function renderAccountButton() {
-  const html = session.user ? avatar(myPicture(), 'btn') : icon('user');
+  const html = session.user ? avatar(myPicture(), 'fill') : icon('user');
   $('accountBtn').classList.toggle('in', !!session.user);
   if (html === shownButton) return; // a photo is large; don't re-insert it on every render
   shownButton = html;
