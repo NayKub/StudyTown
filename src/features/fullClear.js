@@ -1,15 +1,18 @@
 // Full clear: the town fills the whole screen with everything else hidden, like a video player's
-// full-screen mode. A running timer stays as a small ring in the top-left corner; a tap or a mouse
-// move shows the exit button for a few seconds.
+// full-screen mode. The timer stays as a ring in the top-left corner with start/pause and end
+// buttons under it; a tap or a mouse move shows the exit button for a few seconds.
 import { G } from '../core/state.js';
 import { $ } from '../ui/dom.js';
 import * as native from '../platform/native.js';
 import { setSheet } from './bottomSheet.js';
-import { sessionProgress } from './timer.js';
+import { sessionProgress, onStartClick, onStopClick } from './timer.js';
+import { t } from '../i18n/index.js';
+import { icon } from '../ui/icons.js';
 
 const CONTROLS_MS = 2500;
-const ARC_LENGTH = 169.65; // circumference of the ring in index.html (r = 27)
-let shown = { text: null, paused: null, offset: null };
+const ARC_LENGTH = 175.93; // circumference of the ring in index.html (r = 28)
+const fresh = () => ({ text: null, paused: null, offset: null, play: null, visit: null });
+let shown = fresh();
 let hideTimer = 0;
 let usedBrowserFullscreen = false;
 
@@ -45,26 +48,28 @@ export function exitFullClear() {
   document.body.classList.remove('fullClear', 'controls');
   clearTimeout(hideTimer);
   native.setBarsHidden(false);
-  shown = { text: null, paused: null, offset: null };
+  shown = fresh();
   if (usedBrowserFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
   usedBrowserFullscreen = false;
 }
 
-/** The running timer's ring. Called on every tick. */
+/** The timer ring and its buttons. Called on every tick and after each button press. */
 export function renderFullTime() {
   if (!isFullClear()) return;
-  const ring = $('fullRing');
-  ring.hidden = !G.timer.active;
-  if (!G.timer.active) return;
+  const box = $('fullTimer');
+  const visiting = Boolean(G.visit);
+  // in a friend's town the timer can't be used, so only a session already running is shown
+  box.hidden = visiting && !G.timer.active;
+  if (box.hidden) return;
   const text = $('clock').textContent;
   if (shown.text !== text) {
     $('fullTime').textContent = text;
     $('fullTime').classList.toggle('long', text.length > 5);
     shown.text = text;
   }
-  const paused = !G.timer.running;
+  const paused = G.timer.active && !G.timer.running;
   if (shown.paused !== paused) {
-    ring.classList.toggle('paused', paused);
+    box.classList.toggle('paused', paused);
     shown.paused = paused;
   }
   const offset = (ARC_LENGTH * (1 - sessionProgress())).toFixed(2);
@@ -72,14 +77,34 @@ export function renderFullTime() {
     $('fullArc').setAttribute('stroke-dashoffset', offset);
     shown.offset = offset;
   }
+  const play = G.timer.running ? 'pause' : G.timer.active ? 'resume' : 'start';
+  if (shown.play !== play || shown.visit !== visiting) {
+    const btn = $('fullPlay');
+    btn.innerHTML = icon(G.timer.running ? 'pause' : 'play');
+    btn.setAttribute('aria-label', t('btn.' + play));
+    btn.title = t('btn.' + play);
+    $('fullStop').hidden = !G.timer.active;
+    $('fullStop').title = t('btn.stop');
+    $('fullCtl').hidden = visiting;
+    shown.play = play;
+    shown.visit = visiting;
+  }
 }
 
 export function initFullClear() {
   $('fullBtn').addEventListener('click', enterFullClear);
   $('fullExit').addEventListener('click', exitFullClear);
+  $('fullPlay').addEventListener('click', () => {
+    onStartClick();
+    renderFullTime();
+  });
+  $('fullStop').addEventListener('click', () => {
+    onStopClick();
+    renderFullTime();
+  });
   const stage = $('stage');
   stage.addEventListener('pointerup', (e) => {
-    if (isFullClear() && !e.target.closest('.fullBar')) showControls();
+    if (isFullClear() && !e.target.closest('.fullBar, .fullTimer')) showControls();
   });
   stage.addEventListener('mousemove', () => {
     if (isFullClear()) showControls();
@@ -87,7 +112,10 @@ export function initFullClear() {
   document.addEventListener('keydown', (e) => {
     if (e.target.closest && e.target.closest('input, textarea')) return;
     if (e.key === 'Escape' && isFullClear()) exitFullClear();
-    else if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey) {
+    else if (e.key === ' ' && isFullClear() && !e.target.closest('button')) {
+      e.preventDefault(); // space starts or pauses the timer, like a video player
+      if (!G.visit) $('fullPlay').click();
+    } else if ((e.key === 'f' || e.key === 'F') && !e.metaKey && !e.ctrlKey) {
       if (isFullClear()) exitFullClear();
       else enterFullClear();
     }

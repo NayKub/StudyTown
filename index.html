@@ -95,13 +95,19 @@
       <button class="round" id="fullBtn" data-i18n-label="a11y.full" data-icon="expand"></button>
     </div>
     <div class="fullBar" id="fullBar"><button class="round" id="fullExit" data-i18n-label="a11y.fullExit" data-icon="shrink"></button></div>
-    <div class="fullRing" id="fullRing" hidden>
-      <svg viewBox="0 0 64 64" aria-hidden="true">
-        <defs><linearGradient id="fullGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="gStart" /><stop offset="1" class="gEnd" /></linearGradient></defs>
-        <circle cx="32" cy="32" r="27" class="frTrack" />
-        <circle cx="32" cy="32" r="27" class="frArc" id="fullArc" stroke-dasharray="169.65" stroke-dashoffset="169.65" />
-      </svg>
-      <span class="frTime" id="fullTime"></span>
+    <div class="fullTimer" id="fullTimer" hidden>
+      <div class="fullRing" id="fullRing">
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+          <defs><linearGradient id="fullGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" class="gStart" /><stop offset="1" class="gEnd" /></linearGradient></defs>
+          <circle cx="32" cy="32" r="28" class="frTrack" />
+          <circle cx="32" cy="32" r="28" class="frArc" id="fullArc" stroke-dasharray="175.93" stroke-dashoffset="175.93" />
+        </svg>
+        <span class="frTime" id="fullTime"></span>
+      </div>
+      <div class="fullCtl" id="fullCtl">
+        <button class="round play" id="fullPlay"></button>
+        <button class="round" id="fullStop" data-i18n-label="btn.stop" data-icon="stop"></button>
+      </div>
     </div>
     <div class="visitPill" id="visitBar" hidden><span id="visitPic"></span><span id="visitText"></span><span class="visitTimer" id="visitTimer" hidden></span><button class="visitBack" id="visitBack" data-i18n-label="visit.back"><span data-icon="back"></span><span data-i18n="visit.backShort"></span></button></div>
     <div class="visitBar replayBar" id="replayBar" hidden><span data-icon="film"></span><span id="replayText"></span><button class="chip" id="replayStop" data-i18n="replay.stop"></button></div>

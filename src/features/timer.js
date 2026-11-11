@@ -116,7 +116,7 @@ function startOrResume() {
   if (G.settings.notify) native.ensureNotifyPermission();
 }
 
-function onStartClick() {
+export function onStartClick() {
   if (G.visit) return; // the timer can only be used in your own town
   unlockAudio();
   if (timer.running) pause();
@@ -128,7 +128,7 @@ function onStartClick() {
   saveNow();
 }
 
-function onStopClick() {
+export function onStopClick() {
   if (!timer.active || G.visit) return;
   pause();
   endSession(false, Math.floor(timer.credited / 60));

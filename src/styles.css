@@ -1775,23 +1775,35 @@ body.fullClear.controls .fullBar {
   opacity: 1;
   pointer-events: auto;
 }
-/* the running timer: a small ring in the top-left corner that stays while full clear is on */
-.fullRing {
+/* in full clear, messages go to the bottom so they never cover the timer in the corner */
+body.fullClear .toasts {
+  top: auto;
+  bottom: max(24px, calc(var(--sab) + 12px));
+  z-index: 4;
+}
+/* the timer in full clear: a ring in the top-left corner with its buttons underneath */
+.fullTimer {
   display: none;
 }
-body.fullClear .fullRing:not([hidden]) {
+body.fullClear .fullTimer:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  position: absolute;
+  top: max(16px, var(--sat));
+  left: max(16px, var(--sal));
+  z-index: 3;
+}
+.fullRing {
+  position: relative;
   display: grid;
   place-items: center;
-  position: absolute;
-  top: max(14px, var(--sat));
-  left: max(14px, var(--sal));
-  z-index: 3;
-  width: 64px;
-  height: 64px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   background: var(--glass);
   box-shadow: var(--shadow);
-  pointer-events: none;
 }
 .fullRing svg {
   position: absolute;
@@ -1801,7 +1813,7 @@ body.fullClear .fullRing:not([hidden]) {
 .frTrack,
 .frArc {
   fill: none;
-  stroke-width: 5;
+  stroke-width: 6;
 }
 .frTrack {
   stroke: var(--track);
@@ -1820,32 +1832,50 @@ body.fullClear .fullRing:not([hidden]) {
 .frTime {
   position: relative;
   font-weight: 800;
-  font-size: 13px;
+  font-size: 20px;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   color: var(--ink);
 }
 .frTime.long {
-  font-size: 11px;
+  font-size: 16px;
 }
-.fullRing.paused .frArc {
+.fullTimer.paused .frArc {
   stroke: var(--soft);
 }
-.fullRing.paused .frTime {
+.fullTimer.paused .frTime {
   color: var(--soft);
 }
+.fullCtl {
+  display: flex;
+  gap: 8px;
+}
+.fullCtl[hidden],
+.fullCtl .round[hidden] {
+  display: none;
+}
+.fullCtl .round {
+  box-shadow: var(--shadow);
+}
+.fullCtl .round.play {
+  background: linear-gradient(135deg, var(--yellow), var(--pink));
+  border-color: transparent;
+  color: #4a2b3a;
+}
 @media (min-width: 900px) {
-  body.fullClear .fullRing:not([hidden]) {
-    width: 76px;
-    height: 76px;
-    top: 20px;
-    left: 20px;
+  body.fullClear .fullTimer:not([hidden]) {
+    top: 24px;
+    left: 24px;
+  }
+  .fullRing {
+    width: 120px;
+    height: 120px;
   }
   .frTime {
-    font-size: 15px;
+    font-size: 25px;
   }
   .frTime.long {
-    font-size: 13px;
+    font-size: 20px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
