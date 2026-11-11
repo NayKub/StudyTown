@@ -2,6 +2,7 @@
 import * as cloud from '#cloud';
 import { t } from '../../i18n/index.js';
 import { $, esc, toast } from '../../ui/dom.js';
+import { icon } from '../../ui/icons.js';
 import { cityAt } from '../../core/city.js';
 import { todayKey } from '../../core/dates.js';
 import { session } from './session.js';
@@ -39,14 +40,14 @@ function statsLine(profile) {
   if (!profile) return t('friends.noStats');
   const today = profile.dayKey === todayKey() ? profile.todayMin || 0 : 0; // their "today" may be yesterday's
   const rank = t('rank')[cityAt(profile.totalMin || 0).rank];
-  const streak = profile.streak ? ` · 🔥${profile.streak}` : '';
-  const badges = profile.badges ? ` · 🏅${Number(profile.badges) || 0}` : '';
+  const streak = profile.streak ? ` · ${icon('flame')}${Number(profile.streak) || 0}` : '';
+  const badges = profile.badges ? ` · ${icon('medal')}${Number(profile.badges) || 0}` : '';
   return `${rank} · ${t('friends.today', { m: today })}${streak}${badges}`;
 }
 
 const incomingRow = (r) => `
       <div class="fRow">${avatar(r.fromName, r.from)}<div class="fMain"><b>${esc(r.fromName)}</b><small>${t('friends.wants')}</small></div>
-      <button class="chip on" data-act="accept" data-id="${esc(r.from)}">${t('friends.accept')}</button><button class="chip" data-act="decline" data-id="${esc(r.from)}">✕</button></div>`;
+      <button class="chip on" data-act="accept" data-id="${esc(r.from)}">${t('friends.accept')}</button><button class="chip" data-act="decline" data-id="${esc(r.from)}" aria-label="${t('acc.cancel')}">${icon('close')}</button></div>`;
 
 const outgoingRow = (r) => `
       <div class="fRow">${avatar(r.toName, r.to)}<div class="fMain"><b>${esc(r.toName)}</b><small>${t('friends.waiting')}</small></div>
@@ -58,7 +59,7 @@ const confirmRemoveRow = (f) => `
 
 const friendRow = (f) => `
       <div class="fRow">${avatar(f.name, f.uid)}<div class="fMain"><b>${esc(nameOf(f))}</b><small>${statsLine(f.profile)}</small></div>
-      <button class="chip on" data-act="visit" data-id="${esc(f.uid)}">🏡 ${t('friends.visit')}</button><button class="chip ghostX" data-act="askRemove" data-id="${esc(f.uid)}" aria-label="${t('friends.remove')}">⋯</button></div>`;
+      <button class="chip on" data-act="visit" data-id="${esc(f.uid)}">${icon('home')}${t('friends.visit')}</button><button class="chip ghostX" data-act="askRemove" data-id="${esc(f.uid)}" aria-label="${t('friends.remove')}">${icon('more')}</button></div>`;
 
 function guestView() {
   return `<p class="fine">${t('friends.guest')}</p><button class="btn" data-act="openAccount">${t('friends.loginBtn')}</button>`;

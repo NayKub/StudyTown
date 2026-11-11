@@ -13,7 +13,6 @@ import { checkAchievements } from './achievements.js';
 const SAMPLE_W = 104; // size of each preview picture in CSS pixels
 const SAMPLE_H = 92;
 const SAMPLE_ZOOM = 1.4;
-const KIND_ICON = { house: '🏠', shop: '🏪', trees: '🌳', garden: '🌷', pond: '🦆' };
 
 let onBuilt = () => {};
 const waiting = () => pendingPlots(ownTown());
@@ -25,7 +24,7 @@ export function renderBuildChip() {
   const count = waiting().length;
   const chip = $('buildBtn');
   chip.hidden = !(count && inOwnTown());
-  if (!chip.hidden) chip.textContent = t('build.chip', { count });
+  if (!chip.hidden) $('buildCount').textContent = t('build.chip', { count });
 }
 
 function drawSample(canvas, p, kind) {
@@ -49,7 +48,7 @@ function renderChooser() {
   $('buildCards').innerHTML = optionsFor(p)
     .map(
       (kind) =>
-        `<button class="buildCard" data-kind="${kind}"><canvas style="width:${SAMPLE_W}px;height:${SAMPLE_H}px"></canvas><b>${KIND_ICON[kind]} ${t('kind2.' + kind)}</b></button>`,
+        `<button class="buildCard" data-kind="${kind}"><canvas style="width:${SAMPLE_W}px;height:${SAMPLE_H}px"></canvas><b>${t('kind2.' + kind)}</b></button>`,
     )
     .join('');
   $('buildCards')

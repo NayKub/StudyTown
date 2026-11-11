@@ -8,6 +8,9 @@ import { clamp } from '../core/util.js';
 import { todayKey } from '../core/dates.js';
 import { t } from '../i18n/index.js';
 import { $, toast, showModal, hideModal } from '../ui/dom.js';
+import { icon } from '../ui/icons.js';
+import { realMin } from '../core/state.js';
+import { cityAt } from '../core/city.js';
 import * as native from '../platform/native.js';
 import { markDirty, saveNow } from './persistence.js';
 import { checkGrowth } from './growth.js';
@@ -105,6 +108,7 @@ function startOrResume() {
     timer.credited = 0;
     timer.active = true;
     timer.sessionStart = Date.now();
+    timer.plotsAtStart = cityAt(realMin()).n; // to say how many plots this session unlocked
   }
   timer.startedAt = Date.now();
   timer.running = true;
@@ -142,8 +146,16 @@ function recordSession() {
   if (extra > 0) G.state.sessions.splice(0, extra);
 }
 
+/** What the finished session achieved, in plain numbers. */
+function doneSummary(minutes, unlocked) {
+  const parts = [t('done.text', { m: minutes })];
+  if (unlocked > 0) parts.push(t('done.plots', { count: unlocked }));
+  return parts.join(' ');
+}
+
 /** completed = the timer ran out (as opposed to the user pressing End). */
 function endSession(completed, minutes) {
+  const unlocked = cityAt(realMin()).n - (timer.plotsAtStart ?? cityAt(realMin()).n);
   recordSession();
   timer.active = false;
   timer.running = false;
@@ -160,7 +172,7 @@ function endSession(completed, minutes) {
   if (completed) {
     chime();
     if (G.settings.haptics) native.buzz('success');
-    $('doneText').textContent = t('done.text', { m: minutes });
+    $('doneText').textContent = doneSummary(minutes, unlocked);
     showModal('doneModal');
   } else if (minutes > 0) {
     toast(t('toast.saved', { m: minutes }));
@@ -189,19 +201,25 @@ export function sessionEndTime() {
 export const sessionMinutes = () => Math.round(timer.dur / 60);
 
 // ---------- display ----------
+let shownStartLabel = '';
 export function renderTimer() {
   const done = timer.active ? Math.min(elapsed(), timer.dur) : 0;
   const text = formatClock(Math.max(0, timer.dur - done));
   $('clock').textContent = text;
   $('ring').setAttribute('stroke-dashoffset', RING_LENGTH * (1 - done / timer.dur));
   $('status').textContent = t(!timer.active ? 'status.ready' : timer.running ? 'status.studying' : 'status.paused');
-  $('startBtn').textContent = t(timer.running ? 'btn.pause' : timer.active ? 'btn.resume' : 'btn.start');
+  const label = t(timer.running ? 'btn.pause' : timer.active ? 'btn.resume' : 'btn.start');
+  if (label !== shownStartLabel) {
+    // only touch the button when it changes, so a tap is never lost to a redraw
+    shownStartLabel = label;
+    $('startBtn').innerHTML = `${icon(timer.running ? 'pause' : 'play')}<span>${label}</span>`;
+  }
   document.title = timer.running ? text + ' • ' + t('app.title') : t('app.title');
 
   // while visiting a friend, your own session shows on the purple banner
   const banner = $('visitTimer');
   banner.hidden = !(G.visit && timer.active);
-  if (!banner.hidden) banner.textContent = (timer.running ? '⏱ ' : '⏸ ') + text;
+  if (!banner.hidden) banner.textContent = (timer.running ? '' : t('status.paused') + ' ') + text;
 }
 
 export function initTimer() {

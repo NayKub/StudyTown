@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import { applyIcons } from '../ui/icons.js';
 import th from './locales/th.json';
 import en from './locales/en.json';
 
@@ -27,6 +28,7 @@ export async function setLang(l) {
 
 /** Fill every element marked with data-i18n / data-i18n-ph / data-i18n-label. */
 export function applyI18n() {
+  applyIcons();
   document.documentElement.lang = i18next.language;
   document.querySelectorAll('[data-i18n]').forEach((el) => {
     el.textContent = t(el.dataset.i18n);

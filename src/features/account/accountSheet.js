@@ -2,6 +2,7 @@
 import * as cloud from '#cloud';
 import { t, locale } from '../../i18n/index.js';
 import { $, esc, toast, showModal, hideModal } from '../../ui/dom.js';
+import { icon } from '../../ui/icons.js';
 import { session } from './session.js';
 import { sync, syncStatus } from './sync.js';
 import { avatar, copyCode } from './shared.js';
@@ -87,7 +88,7 @@ function guestView(note) {
 }
 
 function verifyView(user) {
-  if (user.verified) return `<span class="pill ok">✓ ${t('acc.verified')}</span>`;
+  if (user.verified) return `<span class="pill ok">${icon('check')}${t('acc.verified')}</span>`;
   return `<div class="warnBox">${t('acc.notVerified')}<div class="row gap"><button class="linkbtn" data-act="resend">${t('acc.resend')}</button><button class="linkbtn" data-act="checkVerified">${t('acc.iVerified')}</button></div></div>`;
 }
 
@@ -100,11 +101,11 @@ function syncView() {
         : s.code === 'unavailable'
           ? 'acc.err.net'
           : 'acc.syncErrOther';
-    return `<div class="warnBox">⚠️ ${t(key, { code: esc(s.code) })}</div>`;
+    return `<div class="warnBox">${icon('warn')}${t(key, { code: esc(s.code) })}</div>`;
   }
-  if (s.status !== 'ok') return `<p class="fine">☁️ ${t('acc.syncing')}</p>`;
+  if (s.status !== 'ok') return `<p class="fine">${icon('cloud')}${t('acc.syncing')}</p>`;
   const time = new Date(s.at).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
-  return `<p class="fine">☁️ ${t('acc.syncOk', { time })}</p>`;
+  return `<p class="fine">${icon('cloud')}${t('acc.syncOk', { time })}</p>`;
 }
 
 function deleteView() {

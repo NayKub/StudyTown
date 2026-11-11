@@ -188,7 +188,7 @@ function pond({ cx, cy, night, now, seed }) {
 }
 
 /** An unlocked plot waiting for its owner to choose: bare earth, a striped barrier and a sign. */
-function buildingSite({ cx, cy, now }) {
+function buildingSite({ cx, cy }) {
   poly(pts(cx - 22, cy, cx, cy + 11, cx + 22, cy, cx, cy - 11), '#e6cfa3');
   for (const side of [-1, 1]) {
     ctx.fillStyle = '#a8754f'; // barrier posts
@@ -198,12 +198,11 @@ function buildingSite({ cx, cy, now }) {
     ctx.fillStyle = k % 2 ? '#fff' : '#ffb347'; // striped bar
     ctx.fillRect(cx - 13 + k * 4.4, cy - 9, 4.4, 4);
   }
-  const bob = Math.sin(now / 300) * 1.5;
-  circle(cx, cy - 22 + bob, 7, '#ff8fab'); // "?" bubble
+  circle(cx, cy - 22, 7, '#ff8fab'); // "?" bubble
   ctx.fillStyle = '#fff';
   ctx.font = 'bold 10px Mali, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('?', cx, cy - 18.5 + bob);
+  ctx.fillText('?', cx, cy - 18.5);
   ctx.textAlign = 'start';
 }
 

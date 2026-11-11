@@ -9,6 +9,7 @@
   --blue: #7cc6fe;
   --green: #8fd694;
   --yellow: #ffd36e;
+  --grid: rgba(120, 150, 190, 0.22); /* graph-paper lines behind the charts */
   --ring: 200px;
   /* Capacitor injects --safe-area-inset-* on Android; env() covers iOS and the web. */
   --sat: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
@@ -479,8 +480,10 @@ canvas.drag {
   text-align: center;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
   animation:
-    pop 0.4s cubic-bezier(0.3, 1.6, 0.5, 1),
-    fade 0.5s 3s forwards;
+    pop 0.35s cubic-bezier(0.3, 1.5, 0.5, 1),
+    fade 0.4s calc(var(--stay, 2600ms) - 400ms) forwards;
+  white-space: pre-line;
+  line-height: 1.5;
 }
 @keyframes pop {
   from {
@@ -1202,7 +1205,7 @@ body.visiting .next {
   height: 64px;
   flex: none;
 }
-.goalRingWrap svg {
+.goalRingWrap > svg {
   width: 100%;
   height: 100%;
   transform: rotate(-90deg);
@@ -1285,10 +1288,6 @@ body.visiting .next {
   border: 2px solid var(--yellow);
   opacity: 1;
 }
-.badge2 .ico {
-  font-size: 26px;
-  flex: none;
-}
 .badge2 b {
   display: block;
   font-size: 13px;
@@ -1320,19 +1319,9 @@ body.visiting .next {
   box-shadow: 0 4px 0 var(--pinkd);
   cursor: pointer;
   white-space: nowrap;
-  animation: nudge 1.6s ease-in-out infinite;
 }
 .buildChip[hidden] {
   display: none;
-}
-@keyframes nudge {
-  0%,
-  100% {
-    transform: translateX(-50%) translateY(0);
-  }
-  50% {
-    transform: translateX(-50%) translateY(-5px);
-  }
 }
 .buildCards {
   display: grid;
@@ -1394,4 +1383,142 @@ body.replaying .toasts {
 }
 .linkbtn[hidden] {
   display: none;
+}
+
+/* ---------- icons ---------- */
+.ico {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: -0.22em;
+}
+.ttl {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+h2.ttl {
+  display: flex;
+}
+[data-icon] {
+  display: inline-flex;
+}
+.btn .ico,
+.chip .ico,
+.linkbtn .ico,
+.fine .ico,
+.pill .ico,
+.warnBox .ico,
+.fMain .ico,
+.sess .ico,
+.save .ico,
+.lockNote .ico,
+.visitBar .ico,
+.previewTag .ico {
+  margin-right: 5px;
+}
+.fMain small .ico {
+  width: 1.05em;
+  height: 1.05em;
+  margin-right: 2px;
+}
+.btn,
+.buildChip,
+.save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.save {
+  display: flex;
+}
+.round {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+}
+.round .ico {
+  width: 22px;
+  height: 22px;
+}
+.modal .big {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--yellow), var(--pink));
+  color: #fff;
+  align-items: center;
+  justify-content: center;
+  display: flex;
+}
+.modal .big .ico {
+  width: 34px;
+  height: 34px;
+  stroke-width: 2.4;
+}
+.badge2 .pic {
+  font-size: 26px;
+  flex: none;
+  color: var(--soft);
+  display: inline-flex;
+}
+.goalCard.reached .goalRingWrap span {
+  color: var(--ink);
+}
+.goalRingWrap .ico {
+  width: 26px;
+  height: 26px;
+  stroke-width: 2.6;
+}
+
+/* ---------- charts on graph paper ---------- */
+.mini,
+.chart {
+  position: relative;
+}
+.mini::before,
+.chart::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 14px 14px;
+  background-position: -1px bottom;
+  border-radius: 4px;
+  pointer-events: none;
+}
+.mini::before {
+  bottom: 22px; /* the grid stops above the day labels */
+}
+.mini .col,
+.chart .col {
+  z-index: 1;
+}
+.mini .b,
+.chart .b {
+  background: transparent;
+  border-radius: 3px 3px 0 0;
+}
+.mini .b.has,
+.chart .b.has {
+  background: linear-gradient(180deg, var(--pink), var(--yellow));
+}
+.mini .b:not(.has),
+.chart .b:not(.has) {
+  border-bottom: 2px solid rgba(74, 59, 82, 0.25);
+  min-height: 0;
+}
+.next p:first-child {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }

@@ -18,25 +18,25 @@
   },
   "status": {
     "ready": "Ready to study",
-    "studying": "Studying… keep going ✨",
+    "studying": "Studying",
     "paused": "Paused"
   },
   "btn": {
-    "start": "▶ Start",
-    "pause": "❚❚ Pause",
-    "resume": "▶ Resume",
-    "stop": "■ End"
+    "start": "Start",
+    "pause": "Pause",
+    "resume": "Resume",
+    "stop": "End"
   },
   "next": {
-    "label": "🔨 Next building:",
+    "label": "Next building:",
     "left": "Study {{m}} more min to unlock",
-    "doneName": "Town complete!",
-    "doneText": "You have built on every plot 🏙️",
-    "choice": "Your choice! 🔨"
+    "doneName": "Town complete",
+    "doneText": "Every plot is built.",
+    "choice": "Your choice"
   },
   "week": {
-    "title": "📅 Last 7 days",
-    "open": "Full log →",
+    "title": "Last 7 days",
+    "open": "Full log",
     "today": "Today"
   },
   "stats": {
@@ -44,48 +44,51 @@
     "today": "Today",
     "streak": "Streak",
     "buildings": "Buildings",
-    "saved": "💾 Saved on this device"
+    "saved": "Saved on this device"
   },
   "badge": {
     "sub": "Residents {{pop}} · Buildings {{n}}"
   },
   "preview": {
-    "tag": "👀 Peeking at the future",
+    "tag": "Preview of a later town",
     "label": "Peek ahead",
-    "off": "Not while studying 📚"
+    "off": "Not available while the timer is running."
   },
   "hint": "Drag to move · Zoom · Double-tap to recentre",
   "done": {
-    "title": "Well done!",
-    "text": "You studied for {{m}} min and your town grew again 🏗️",
-    "ok": "See my town"
+    "title": "Session complete",
+    "text": "{{m}} minutes done.",
+    "ok": "See my town",
+    "plots_one": "One new plot is ready.",
+    "plots_other": "{{count}} new plots are ready."
   },
   "log": {
-    "title": "📅 Study log",
+    "title": "Study log",
     "range": "{{n}} days",
     "total": "Total in range",
     "avg": "Daily average",
     "best": "Best day",
     "daily": "By day",
     "today": "Today",
-    "empty": "No records yet. Start your first session ✏️",
+    "empty": "No sessions yet. Your first one will show up here.",
     "minutes": "{{m}} min"
   },
   "toast": {
-    "built": "🎉 Built: {{name}}!",
-    "upgrade": "⬆️ Upgraded to {{name}}!",
-    "rank": "🏅 Congrats! You now have a \"{{name}}\"",
-    "saved": "👏 {{m}} min added to your town",
-    "plotReady_one": "🔨 A new plot is ready. Choose what to build!",
-    "plotReady_other": "🔨 {{count}} new plots are ready. Choose what to build!"
+    "built": "{{name}} built.",
+    "upgrade": "Upgraded to {{name}}.",
+    "rank": "New rank: {{name}}.",
+    "saved": "{{m}} min added to your town.",
+    "plotReady_one": "A new plot is ready to build on.",
+    "plotReady_other": "{{count}} new plots are ready to build on.",
+    "more": "and {{count}} more"
   },
   "kind": {
-    "hall": "Your first tent",
+    "hall": "First tent",
     "trees": "Trees",
     "garden": "Flower garden",
-    "shop": "Little shop",
+    "shop": "Shop",
     "pond": "Pond",
-    "house": "New house"
+    "house": "House"
   },
   "up": {
     "hall": [
@@ -129,9 +132,9 @@
     "City",
     "Metropolis"
   ],
-  "sign": "Start here!",
+  "sign": "Start here",
   "settings": {
-    "title": "⚙️ Settings",
+    "title": "Settings",
     "language": "Language",
     "keepAwake": "Keep screen on while studying",
     "sound": "Sound when time is up",
@@ -141,8 +144,8 @@
     "goal": "Daily goal"
   },
   "notif": {
-    "title": "Time's up! 🎉",
-    "body": "You studied for {{m}} min. Come and see your town."
+    "title": "Time's up",
+    "body": "{{m}} minutes done. Your town is waiting."
   },
   "a11y": {
     "log": "Study log",
@@ -155,41 +158,41 @@
     "less": "Swipe down to close"
   },
   "visit": {
-    "title": "🏡 {{name}}'s town",
+    "title": "{{name}}'s town",
     "back": "Back to mine",
-    "locked": "🔒 The timer only works in your own town"
+    "locked": "The timer only works in your own town."
   },
   "friends": {
-    "title": "👫 Friends",
+    "title": "Friends",
     "guest": "Log in to add friends, visit their towns and back up your own town. You can keep using the app as a guest.",
     "loginBtn": "Log in or sign up",
     "placeholder": "Friend code or email",
     "add": "Add",
     "myCode": "My friend code",
     "copy": "Copy",
-    "copied": "Copied {{code}}",
+    "copied": "Copied {{code}}.",
     "requests": "Friend requests",
     "wants": "wants to be friends",
     "accept": "Accept",
     "pending": "Waiting for them",
     "waiting": "Request sent",
     "list": "My friends",
-    "none": "No friends yet. Share your friend code!",
+    "none": "No friends yet. Share your friend code to add one.",
     "visit": "Visit",
     "remove": "Remove",
     "removeQ": "Remove {{name}}?",
     "today": "{{m}} min today",
     "noStats": "No study time yet",
     "notFound": "No one found with that code or email.",
-    "self": "That's you! 😄",
+    "self": "That's your own code.",
     "already": "{{name}} is already your friend.",
     "alreadySent": "You already sent {{name}} a request.",
-    "sent": "Request sent to {{name}} 💌",
-    "nowFriends": "You and {{name}} are now friends 🎉",
+    "sent": "Request sent to {{name}}.",
+    "nowFriends": "You and {{name}} are now friends.",
     "errPerm": "Friends are not set up on the server yet (database rules)."
   },
   "acc": {
-    "title": "👤 My account",
+    "title": "My account",
     "login": "Log in",
     "signup": "Sign up",
     "create": "Create account",
@@ -212,9 +215,9 @@
     "deleteWarn": "This deletes your account, cloud backup and friends. The town on this device stays. Enter your password to confirm.",
     "deleteConfirm": "Delete",
     "cancel": "Cancel",
-    "deleted": "Account deleted",
-    "welcome": "Welcome! Check your inbox to confirm your email.",
-    "hello": "Logged in 👋",
+    "deleted": "Account deleted.",
+    "welcome": "Account created. Check your inbox to confirm your email.",
+    "hello": "Logged in.",
     "bye": "Logged out. Your town is still on this device.",
     "goLogin": "Log in instead",
     "resetSent": "If that email has an account, a reset link is on its way.",
@@ -231,35 +234,35 @@
     },
     "syncOk": "Synced with your account at {{time}}",
     "syncNow": "Sync now",
-    "syncDone": "Synced ☁️",
+    "syncDone": "Synced.",
     "syncErrPerm": "Sync was refused by the server. The database rules in Firebase need to be published again.",
     "syncErrOther": "Sync failed ({{code}})."
   },
   "goal": {
     "title": "Today's goal",
     "progress": "{{m}} / {{goal}} min",
-    "streak_one": "🔥 {{count}}-day streak",
-    "streak_other": "🔥 {{count}}-day streak",
-    "hint": "A little every day adds up",
-    "reached": "🎯 Daily goal reached: {{m}} minutes!"
+    "streak_one": "{{count}}-day streak",
+    "streak_other": "{{count}}-day streak",
+    "hint": "A little every day adds up.",
+    "reached": "Daily goal reached ({{m}} min)."
   },
   "replay": {
-    "button": "🎬 Watch my town grow",
-    "title": "🎬 {{time}}",
+    "button": "Watch my town grow",
+    "title": "{{time}}",
     "stop": "Stop",
-    "done": "That was {{time}} of studying. Well done! 🎉",
-    "empty": "Study a little first, then watch your town grow 🌱"
+    "done": "{{time}} of study built this town.",
+    "empty": "Nothing to replay yet. Study first, then watch it grow."
   },
   "build": {
-    "chip_one": "🔨 Build ({{count}})",
-    "chip_other": "🔨 Build ({{count}})",
-    "title": "🔨 Choose what to build",
+    "chip_one": "Build ({{count}})",
+    "chip_other": "Build ({{count}})",
+    "title": "Choose what to build",
     "hint": "A new plot is ready. Pick one; it will grow as you keep studying.",
     "more_one": "{{count}} more plot is waiting",
     "more_other": "{{count}} more plots are waiting",
-    "auto": "🎲 Surprise me for all",
-    "autoDone_one": "🎲 Built {{count}} surprise!",
-    "autoDone_other": "🎲 Built {{count}} surprises!"
+    "auto": "Surprise me for all",
+    "autoDone_one": "{{count}} plot built by surprise.",
+    "autoDone_other": "{{count}} plots built by surprise."
   },
   "kind2": {
     "house": "House",
@@ -270,11 +273,11 @@
   },
   "ach": {
     "title": "Achievements",
-    "shelf": "🏆 Achievements",
+    "shelf": "Achievements",
     "count": "{{n}} of {{total}}",
-    "none": "Your first badge is one study session away",
-    "unlocked": "🏅 Achievement: {{name}}",
-    "many": "🏅 {{count}} achievements unlocked!",
+    "none": "Your first badge is one study session away.",
+    "unlocked": "Achievement earned: {{name}}.",
+    "many": "{{count}} achievements earned.",
     "first": {
       "name": "First step",
       "desc": "Finish your first study session"

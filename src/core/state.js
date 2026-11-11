@@ -27,6 +27,7 @@ export const G = {
     credited: 0,
     active: false,
     sessionStart: 0,
+    plotsAtStart: null,
   },
   /** Which town is on screen: your own, a "peek ahead" preview, or a friend's. */
   preview: false,

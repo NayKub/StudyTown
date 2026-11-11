@@ -10,14 +10,14 @@
 <div class="app">
   <aside class="side">
     <div class="card head">
-      <h1>🏡 <span data-i18n="app.title"></span></h1>
+      <h1><span data-icon="home"></span><span data-i18n="app.title"></span></h1>
       <div class="sub" data-i18n="app.tagline"></div>
     </div>
 
     <button class="sheetHandle" id="sheetHandle" type="button" aria-expanded="false"><i></i><span id="sheetLabel"></span></button>
 
     <div class="card timerCard">
-      <div class="lockNote"><span data-i18n="visit.locked"></span></div>
+      <div class="lockNote"><span data-icon="lock"></span><span data-i18n="visit.locked"></span></div>
       <div class="presets" id="presets"></div>
       <div class="ringwrap">
         <svg viewBox="0 0 200 200">
@@ -29,12 +29,12 @@
       </div>
       <div class="btns">
         <button class="btn" id="startBtn"></button>
-        <button class="btn ghost" id="stopBtn" data-i18n="btn.stop"></button>
+        <button class="btn ghost" id="stopBtn"><span data-icon="stop"></span><span data-i18n="btn.stop"></span></button>
       </div>
     </div>
 
     <div class="card next">
-      <p><b data-i18n="next.label"></b> <span id="nextName">-</span></p>
+      <p><b class="ttl"><span data-icon="hammer"></span><span data-i18n="next.label"></span></b> <span id="nextName">-</span></p>
       <div class="bar"><i id="nextBar" style="width:0%"></i></div>
       <p class="muted" id="nextLeft">-</p>
     </div>
@@ -51,27 +51,27 @@
         <div class="goalInfo">
           <b data-i18n="goal.title"></b>
           <div id="goalText"></div>
-          <small id="goalStreak"></small>
+          <small class="ttl" id="goalStreak"></small>
         </div>
       </div>
       <div class="row badgeHead">
-        <b data-i18n="ach.shelf"></b>
-        <button class="linkbtn" id="openBadges"><span id="badgeCount"></span> →</button>
+        <b class="ttl"><span data-icon="trophy"></span><span data-i18n="ach.shelf"></span></b>
+        <button class="linkbtn" id="openBadges"><span id="badgeCount"></span></button>
       </div>
       <div class="badgeRow" id="badgeRow"></div>
-      <button class="btn ghost" id="replayBtn" data-i18n="replay.button"></button>
+      <button class="btn ghost" id="replayBtn"><span data-icon="film"></span><span data-i18n="replay.button"></span></button>
     </div>
 
     <div class="card week">
       <div class="row">
-        <b data-i18n="week.title"></b>
+        <b class="ttl"><span data-icon="calendar"></span><span data-i18n="week.title"></span></b>
         <button class="linkbtn" id="openLog" data-i18n="week.open"></button>
       </div>
       <div class="mini" id="mini"></div>
     </div>
 
     <div class="card friendsCard" id="friendsCard" hidden>
-      <div class="row"><b data-i18n="friends.title"></b><span class="count" id="friendCount"></span></div>
+      <div class="row"><b class="ttl"><span data-icon="friends"></span><span data-i18n="friends.title"></span></b><span class="count" id="friendCount"></span></div>
       <div id="friendsBody"></div>
     </div>
 
@@ -82,22 +82,22 @@
         <div class="stat"><small data-i18n="stats.streak"></small><b id="sStreak"></b></div>
         <div class="stat"><small data-i18n="stats.buildings"></small><b id="sBuild"></b></div>
       </div>
-      <div class="save" data-i18n="stats.saved"></div>
+      <div class="save"><span data-icon="device"></span><span data-i18n="stats.saved"></span></div>
     </div>
   </aside>
 
   <main class="stage" id="stage">
     <canvas id="cv"></canvas>
     <div class="badge" id="badge"></div>
-    <div class="previewTag" id="previewTag" data-i18n="preview.tag"></div>
+    <div class="previewTag" id="previewTag"><span data-icon="eye"></span><span data-i18n="preview.tag"></span></div>
     <div class="stageBtns">
-      <button class="round" id="accountBtn" data-i18n-label="a11y.account">👤</button>
-      <button class="round" id="logBtn" data-i18n-label="a11y.log">📅</button>
-      <button class="round" id="settingsBtn" data-i18n-label="a11y.settings">⚙️</button>
+      <button class="round" id="accountBtn" data-i18n-label="a11y.account" data-icon="user"></button>
+      <button class="round" id="logBtn" data-i18n-label="a11y.log" data-icon="calendar"></button>
+      <button class="round" id="settingsBtn" data-i18n-label="a11y.settings" data-icon="settings"></button>
     </div>
-    <div class="visitBar" id="visitBar" hidden><span id="visitText"></span><span class="visitTimer" id="visitTimer" hidden></span><button class="chip" id="visitBack" data-i18n="visit.back"></button></div>
-    <div class="visitBar replayBar" id="replayBar" hidden><span id="replayText"></span><button class="chip" id="replayStop" data-i18n="replay.stop"></button></div>
-    <button class="buildChip" id="buildBtn" hidden></button>
+    <div class="visitBar" id="visitBar" hidden><span data-icon="home"></span><span id="visitText"></span><span class="visitTimer" id="visitTimer" hidden></span><button class="chip" id="visitBack" data-i18n="visit.back"></button></div>
+    <div class="visitBar replayBar" id="replayBar" hidden><span data-icon="film"></span><span id="replayText"></span><button class="chip" id="replayStop" data-i18n="replay.stop"></button></div>
+    <button class="buildChip" id="buildBtn" hidden><span data-icon="hammer"></span><span id="buildCount"></span></button>
     <div class="sheetShade" id="sheetShade"></div>
     <div class="toasts" id="toasts"></div>
     <div class="hint" data-i18n="hint"></div>
@@ -111,7 +111,7 @@
 
 <div class="modal" id="doneModal">
   <div class="card center">
-    <div class="big">🎉</div>
+    <div class="big" data-icon="check"></div>
     <h2 data-i18n="done.title"></h2>
     <p id="doneText"></p>
     <button class="btn" id="doneOk" data-i18n="done.ok"></button>
@@ -121,8 +121,8 @@
 <div class="modal sheet" id="logModal">
   <div class="card">
     <div class="sheetHead">
-      <h2 data-i18n="log.title"></h2>
-      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+      <h2 class="ttl"><span data-icon="calendar"></span><span data-i18n="log.title"></span></h2>
+      <button class="round" data-close data-i18n-label="a11y.close" data-icon="close"></button>
     </div>
     <div class="sum">
       <div class="stat"><small data-i18n="stats.total"></small><b id="aTotal"></b></div>
@@ -145,20 +145,20 @@
 <div class="modal sheet" id="buildModal">
   <div class="card">
     <div class="sheetHead">
-      <h2 data-i18n="build.title"></h2>
-      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+      <h2 class="ttl"><span data-icon="hammer"></span><span data-i18n="build.title"></span></h2>
+      <button class="round" data-close data-i18n-label="a11y.close" data-icon="close"></button>
     </div>
     <p class="fine" data-i18n="build.hint"></p>
     <div class="buildCards" id="buildCards"></div>
-    <p class="fine center"><span id="buildLeft"></span> <button class="linkbtn" id="buildAuto" data-i18n="build.auto"></button></p>
+    <p class="fine center"><span id="buildLeft"></span> <button class="linkbtn" id="buildAuto"><span data-icon="dice"></span><span data-i18n="build.auto"></span></button></p>
   </div>
 </div>
 
 <div class="modal sheet" id="badgesModal">
   <div class="card">
     <div class="sheetHead">
-      <h2 id="badgesTitle"></h2>
-      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+      <h2 class="ttl"><span data-icon="trophy"></span><span id="badgesTitle"></span></h2>
+      <button class="round" data-close data-i18n-label="a11y.close" data-icon="close"></button>
     </div>
     <div class="badgeGrid" id="badgesBody"></div>
   </div>
@@ -167,8 +167,8 @@
 <div class="modal sheet" id="accountModal">
   <div class="card">
     <div class="sheetHead">
-      <h2 id="accTitle"></h2>
-      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+      <h2 class="ttl"><span data-icon="user"></span><span id="accTitle"></span></h2>
+      <button class="round" data-close data-i18n-label="a11y.close" data-icon="close"></button>
     </div>
     <div id="accBody"></div>
   </div>
@@ -177,8 +177,8 @@
 <div class="modal sheet" id="settingsModal">
   <div class="card">
     <div class="sheetHead">
-      <h2 data-i18n="settings.title"></h2>
-      <button class="round" data-close data-i18n-label="a11y.close">✕</button>
+      <h2 class="ttl"><span data-icon="settings"></span><span data-i18n="settings.title"></span></h2>
+      <button class="round" data-close data-i18n-label="a11y.close" data-icon="close"></button>
     </div>
     <div class="setRow"><span data-i18n="settings.language"></span><div class="tabs" id="langTabs"></div></div>
     <div class="setRow"><span data-i18n="settings.goal"></span><div class="tabs" id="goalTabs"></div></div>

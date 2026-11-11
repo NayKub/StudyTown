@@ -3,6 +3,7 @@ import { G } from '../core/state.js';
 import { todayKey, lastDays, dayMin } from '../core/dates.js';
 import { t, locale, fmtMin } from '../i18n/index.js';
 import { $, isShown, showModal } from '../ui/dom.js';
+import { icon } from '../ui/icons.js';
 
 const RANGES = [7, 14, 30];
 const MIN_CHART_SCALE = 30; // minutes; keeps a few minutes of study from filling the whole chart
@@ -95,7 +96,7 @@ function renderDayList() {
       const chips = list
         .map(
           (s) =>
-            `<span>🕐 ${clockTime(s.at)}–${clockTime(s.end)} · ${t('log.minutes', { m: Math.round(s.sec / 60) })}</span>`,
+            `<span>${icon('clock')}${clockTime(s.at)}–${clockTime(s.end)} · ${t('log.minutes', { m: Math.round(s.sec / 60) })}</span>`,
         )
         .join('');
       return (
