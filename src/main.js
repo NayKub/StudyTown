@@ -8,7 +8,7 @@ import './styles.css';
 import { G, realMin } from './core/state.js';
 import { cityAt, encodeChoices } from './core/city.js';
 import { publicStats } from './core/dates.js';
-import { initI18n, applyI18n, t, detectLang } from './i18n/index.js';
+import { initI18n, applyI18n, t, detectLang, locale } from './i18n/index.js';
 import { loadState, loadSettings } from './platform/storage.js';
 import * as native from './platform/native.js';
 import { startRender, syncResidents } from './render/scene.js';
@@ -24,6 +24,10 @@ import * as sheet from './features/bottomSheet.js';
 import * as build from './features/build.js';
 import * as achievements from './features/achievements.js';
 import { renderGoal } from './features/goal.js';
+import { initTheme } from './features/theme.js';
+import * as fullClear from './features/fullClear.js';
+import { setSheet, isSheetOpen } from './features/bottomSheet.js';
+import { hideModal } from './ui/dom.js';
 import * as account from './features/account/index.js';
 
 const TICK_MS = 250;
@@ -53,6 +57,7 @@ function tick() {
   renderHud();
   renderGoal();
   build.renderBuildChip();
+  fullClear.renderFullTime();
   saveIfDue();
   account.sync(false);
   account.refresh(false);
@@ -69,6 +74,7 @@ function replaceState(merged) {
   studyLog.renderLogIfOpen();
   achievements.renderShelf();
   achievements.checkAchievements(); // another device may have brought study time that earns one
+  account.refreshProfile(); // and maybe a new profile picture
 }
 
 /** What friends can see: numbers, the buildings you chose, and how many badges you have. */
@@ -77,12 +83,15 @@ const sharedProfile = () => ({
   build: encodeChoices(G.state.choices),
   from: G.state.chooseFrom,
   badges: Object.keys(G.state.badges).length,
+  avatar: G.state.profile.avatar || '',
+  photo: G.state.profile.photo || '',
 });
 
 /** The app came to the front (true) or went to the background (false). */
 function onAppActive(active) {
   if (active) {
     native.cancelDone(); // we are on screen, so the in-app chime takes over from the notification
+    native.hideOngoing();
     tick();
     account.refresh(true); // pull anything another device added while we were away
     account.sync(false);
@@ -95,6 +104,45 @@ function onAppActive(active) {
   if (endsAt && G.settings.notify && endsAt.getTime() > Date.now() + 1000) {
     native.scheduleDone(endsAt, t('notif.title'), t('notif.body', { m: timer.sessionMinutes() }));
   }
+  if (G.timer.active && G.settings.ongoing) showOngoing(endsAt);
+}
+
+/** The notification (Android) or Live Activity (iPhone) that keeps counting while the app is closed. */
+function showOngoing(endsAt) {
+  const paused = !endsAt;
+  const remaining = timer.remainingText();
+  const endClock = endsAt ? endsAt.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' }) : '';
+  native.showOngoing({
+    endsAt: endsAt ? endsAt.getTime() : 0,
+    paused,
+    remaining,
+    title: t(paused ? 'ongoing.paused' : 'ongoing.studying'),
+    text: paused ? t('ongoing.left', { time: remaining }) : t('ongoing.endsAt', { time: endClock }),
+    appName: t('app.title'),
+    channelName: t('ongoing.channel'),
+  });
+}
+
+/** Android back button: close whatever is on top, otherwise leave the app. */
+function onBack() {
+  if (fullClear.isFullClear()) {
+    fullClear.exitFullClear();
+    return true;
+  }
+  const open = [...document.querySelectorAll('.modal.show')].pop();
+  if (open) {
+    hideModal(open.id);
+    return true;
+  }
+  if (isSheetOpen()) {
+    setSheet(false);
+    return true;
+  }
+  if (G.visit) {
+    townView.endVisit();
+    return true;
+  }
+  return false;
 }
 
 /** Sheets close with their ✕ button or by tapping the dimmed backdrop. */
@@ -121,6 +169,7 @@ async function loadSavedData() {
 
   // Towns from before "choose what to build" keep their buildings; only later plots wait for a choice.
   if (G.state.chooseFrom == null) G.state.chooseFrom = Math.max(1, cityAt(realMin()).n);
+  if (!G.state.profile || typeof G.state.profile !== 'object') G.state.profile = { avatar: '', photo: '', at: 0 };
   for (const key of ['choices', 'badges', 'flags']) {
     if (!G.state[key] || typeof G.state[key] !== 'object') G.state[key] = {};
   }
@@ -129,6 +178,7 @@ async function loadSavedData() {
 
 async function boot() {
   await loadSavedData();
+  initTheme(); // before anything is drawn, so a dark theme never flashes light
   await initI18n(G.settings.lang || detectLang());
   resetGrowth();
 
@@ -149,6 +199,7 @@ async function boot() {
   build.initBuild({ onChoice: () => account.sync(true) });
   achievements.initAchievements({ onNewBadge: () => account.sync(true) });
   bindSheetClosing();
+  fullClear.initFullClear();
 
   startRender($('cv'));
   renderAll();
@@ -170,11 +221,13 @@ async function boot() {
     studyLog.renderLogIfOpen();
   }, HISTORY_REFRESH_MS);
   native.onAppActive(onAppActive);
+  native.onBackButton(onBack);
   window.addEventListener('pagehide', () => {
     timer.credit();
     saveNow();
   });
   native.cancelDone();
+  native.hideOngoing(); // left over from a session that ended while the app was closed
   native.hideSplash();
 }
 

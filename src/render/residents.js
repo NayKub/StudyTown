@@ -5,7 +5,7 @@ import { clamp } from '../core/util.js';
 import { isRoad, ring, plotAt, cityAt, kindOf } from '../core/city.js';
 import { iso, shade, pts } from './primitives.js';
 
-const SPECIES = ['bunny', 'cat', 'bear', 'chick', 'frog', 'pig'];
+export const SPECIES = ['bunny', 'cat', 'bear', 'chick', 'frog', 'pig'];
 const BODY_COLOR = {
   bunny: '#fff4f8',
   cat: '#ffd9a8',

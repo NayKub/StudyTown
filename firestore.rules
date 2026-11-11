@@ -5,6 +5,12 @@ service cloud.firestore {
     function isMe(uid) { return signedIn() && request.auth.uid == uid; }
     function areFriends(a, b) { return exists(/databases/$(database)/documents/friends/$(a)/list/$(b)); }
     function shortText(v, n) { return v is string && v.size() <= n; }
+    // profile pictures: a preset animal id, and a small JPEG data URL (or empty)
+    function okAvatar(d) { return shortText(d.get('avatar', ''), 12); }
+    function okPhoto(d) {
+      let p = d.get('photo', '');
+      return p is string && p.size() < 40000 && (p == '' || p.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+'));
+    }
 
     // Public stats: the owner and their friends can read them.
     match /profiles/{uid} {
@@ -12,7 +18,8 @@ service cloud.firestore {
       allow create, update: if isMe(uid)
         && shortText(request.resource.data.name, 40)
         && request.resource.data.code is string
-        && request.resource.data.totalMin is number && request.resource.data.totalMin >= 0;
+        && request.resource.data.totalMin is number && request.resource.data.totalMin >= 0
+        && okAvatar(request.resource.data) && okPhoto(request.resource.data);
       allow delete: if isMe(uid);
     }
 
@@ -53,7 +60,8 @@ service cloud.firestore {
         && request.resource.data.to != request.auth.uid
         && id == request.auth.uid + '_' + request.resource.data.to
         && !areFriends(request.auth.uid, request.resource.data.to)
-        && shortText(request.resource.data.fromName, 40) && shortText(request.resource.data.toName, 40);
+        && shortText(request.resource.data.fromName, 40) && shortText(request.resource.data.toName, 40)
+        && shortText(request.resource.data.get('fromAvatar', ''), 12);
       allow delete: if signedIn() && (resource == null || resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
     }
 

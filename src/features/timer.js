@@ -162,6 +162,7 @@ function endSession(completed, minutes) {
   timer.before = 0;
   timer.credited = 0;
   native.cancelDone();
+  native.hideOngoing();
   applyAwake();
   setPresetsDisabled(false);
   saveNow();
@@ -199,6 +200,9 @@ export function sessionEndTime() {
 }
 
 export const sessionMinutes = () => Math.round(timer.dur / 60);
+
+/** Time left in the session as "mm:ss" (for the ongoing notification while paused). */
+export const remainingText = () => formatClock(Math.max(0, timer.dur - Math.min(elapsed(), timer.dur)));
 
 // ---------- display ----------
 let shownStartLabel = '';

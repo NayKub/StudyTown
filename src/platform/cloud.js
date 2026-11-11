@@ -282,13 +282,15 @@ export async function findUser(input) {
   return snap.exists() ? { uid: snap.data().uid, name: snap.data().name, code: c } : null;
 }
 
-export async function sendRequest(target, myName, myCode) {
+/** myAvatar = the sender's preset animal (never their photo), shown to the receiver. */
+export async function sendRequest(target, myName, myCode, myAvatar = '') {
   const uid = me().uid;
   await setDoc(doc(db, 'requests', `${uid}_${target.uid}`), {
     from: uid,
     to: target.uid,
     fromName: myName,
     fromCode: myCode,
+    fromAvatar: myAvatar,
     toName: target.name,
     toCode: target.code || '',
     createdAt: serverTimestamp(),

@@ -41,6 +41,13 @@ const DRAWINGS = {
     '<rect x="4.5" y="4.5" width="15" height="15" rx="3"/><path ' +
     DOT +
     ' d="M9 9h.01M15 9h.01M12 12h.01M9 15h.01M15 15h.01"/>',
+  expand: '<path d="M4.5 9V4.5H9M15 4.5h4.5V9M19.5 15v4.5H15M9 19.5H4.5V15"/>',
+  shrink: '<path d="M9 4.5V9H4.5M19.5 9H15V4.5M15 19.5V15h4.5M4.5 15H9v4.5"/>',
+  image:
+    '<rect x="3.8" y="5" width="16.4" height="14" rx="2"/><circle cx="9" cy="10" r="1.7"/><path d="m4.2 17.2 5-4.6 3.4 3 2.6-2.3 4.6 4"/>',
+  sun: '<circle cx="12" cy="12" r="3.8"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6 7 7M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4"/>',
+  moon: '<path d="M19.6 14.6A7.8 7.8 0 0 1 9.4 4.4a7.8 7.8 0 1 0 10.2 10.2Z"/>',
+  back: '<path d="M10 6.5 4.5 12l5.5 5.5M5 12h14.5"/>',
   more: '<path ' + DOT + ' d="M6 12h.01M12 12h.01M18 12h.01"/>',
 };
 

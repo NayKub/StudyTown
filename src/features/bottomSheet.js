@@ -29,10 +29,14 @@ export function setSheet(wantOpen) {
   side.style.height = ''; // hand control back to the stylesheet after a drag
 }
 
-/** The closed sheet shows everything down to the "next building" card; tell the CSS how tall that is. */
+/**
+ * The closed sheet shows everything down to the "next building" card (or, while visiting, the
+ * friend's details); tell the CSS how tall that is.
+ */
 function measurePeek() {
   if (!portrait.matches) return;
-  const next = document.querySelector('.next');
+  const visiting = document.body.classList.contains('visiting');
+  const next = document.querySelector(visiting ? '.friendPanel' : '.next');
   const pad = parseFloat(getComputedStyle(side).paddingBottom) || 10;
   const peek = Math.ceil(next.offsetTop + next.offsetHeight + pad);
   document.documentElement.style.setProperty('--peek', peek + 'px');
@@ -106,6 +110,7 @@ export function initSheet() {
   $('sheetShade').addEventListener('click', () => setSheet(false));
   new ResizeObserver(measurePeek).observe(document.querySelector('.timerCard'));
   new ResizeObserver(measurePeek).observe(document.querySelector('.next'));
+  new ResizeObserver(measurePeek).observe(document.querySelector('.friendPanel'));
   portrait.addEventListener('change', () => {
     setSheet(false);
     measurePeek();

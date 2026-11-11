@@ -3,7 +3,10 @@
 import { G, realMin } from '../core/state.js';
 import { plots, cityAt, decodeChoices } from '../core/city.js';
 import { t, fmtMin } from '../i18n/index.js';
-import { $, toast } from '../ui/dom.js';
+import { $, esc, toast, hideModal } from '../ui/dom.js';
+import { icon } from '../ui/icons.js';
+import { todayKey } from '../core/dates.js';
+import { avatar } from './account/shared.js';
 import { syncResidents, resetView } from '../render/scene.js';
 import { renderHud } from './hud.js';
 import { setSheet } from './bottomSheet.js';
@@ -36,24 +39,63 @@ export function renderPreviewValue() {
 }
 
 // ---------- visiting a friend ----------
-export function renderVisitTitle() {
-  if (G.visit) $('visitText').textContent = t('visit.title', { name: G.visit.name });
+// While visiting, the side panel shows the friend instead of your timer and stats, and a small
+// pill in the corner of the town says whose town it is and leads back.
+
+/** Today's minutes only count if the friend's last upload was today. */
+const friendToday = (p) => (p.dayKey === todayKey() ? p.todayMin || 0 : 0);
+const num = (v) => Math.max(0, Number(v) || 0);
+
+function renderFriendPanel() {
+  const v = G.visit;
+  const p = v.profile;
+  const city = cityAt(v.totalMin);
+  const stat = (key, value) => `<div class="stat"><small>${t(key)}</small><b>${value}</b></div>`;
+  $('friendPanel').innerHTML = `
+    <div class="fpHead">${avatar({ name: v.name, uid: v.uid, avatar: p.avatar, photo: p.photo }, 'lg')}
+      <div class="fpName"><b>${esc(v.name)}</b><small>${t('rank')[city.rank]}</small></div></div>
+    <div class="stats">
+      ${stat('stats.total', fmtMin(num(p.totalMin)))}
+      ${stat('stats.today', fmtMin(friendToday(p)))}
+      ${stat('visit.week', fmtMin(num(p.weekMin)))}
+      ${stat('stats.streak', t('unit.days', { count: num(p.streak) }))}
+      ${stat('stats.buildings', t('unit.pieces', { n: city.n }))}
+      ${stat('visit.badges', num(p.badges))}
+    </div>
+    <button class="btn ghost" id="friendPanelBack">${icon('back')}<span>${t('visit.back')}</span></button>`;
+  $('friendPanelBack').addEventListener('click', endVisit);
 }
 
-/** friend = { name, totalMin, build, from }: build and from describe the buildings they chose. */
+export function renderVisitTitle() {
+  if (!G.visit) return;
+  const v = G.visit;
+  $('visitText').textContent = t('visit.title', { name: v.name });
+  $('visitPic').innerHTML = avatar(
+    { name: v.name, uid: v.uid, avatar: v.profile.avatar, photo: v.profile.photo },
+    'sm',
+  );
+  renderFriendPanel();
+}
+
+/** friend = { uid, name, profile }: profile holds their public stats and the buildings they chose. */
 export function startVisit(friend) {
   stopReplay();
   leavePreview();
+  const profile = friend.profile || {};
   G.visit = {
+    uid: friend.uid,
     name: friend.name,
-    totalMin: friend.totalMin,
-    choices: decodeChoices(friend.build),
-    chooseFrom: typeof friend.from === 'number' ? friend.from : null,
+    profile,
+    totalMin: num(profile.totalMin),
+    choices: decodeChoices(profile.build),
+    chooseFrom: typeof profile.from === 'number' ? profile.from : null,
   };
   G.state.flags.visited = true;
-  document.body.classList.add('visiting'); // lavender frame, locked timer (see styles.css)
+  document.body.classList.add('visiting'); // lavender sky and frame, friend panel (see styles.css)
   $('visitBar').hidden = false;
+  $('friendPanel').hidden = false;
   renderVisitTitle();
+  hideModal('accountModal'); // the visit starts from the friends list in the profile sheet
   setSheet(false);
   resetView();
   townChanged();
@@ -64,6 +106,7 @@ export function endVisit() {
   G.visit = null;
   document.body.classList.remove('visiting');
   $('visitBar').hidden = true;
+  $('friendPanel').hidden = true;
   resetView();
   townChanged();
 }

@@ -6,6 +6,7 @@ import { saveSettings } from '../platform/storage.js';
 import * as native from '../platform/native.js';
 import { applyAwake } from './timer.js';
 import { saveNow } from './persistence.js';
+import { THEMES, applyTheme } from './theme.js';
 
 const GOAL_OPTIONS_MIN = [15, 30, 60, 90, 120];
 
@@ -15,6 +16,11 @@ export function renderSettings() {
   $('langTabs').innerHTML = Object.entries(LANGS)
     .map(([code, name]) => `<button class="chip${code === lang() ? ' on' : ''}" data-lang="${code}">${name}</button>`)
     .join('');
+  const theme = G.settings.theme || 'system';
+  $('themeTabs').innerHTML = THEMES.map(
+    (name) =>
+      `<button class="chip${name === theme ? ' on' : ''}" data-theme-choice="${name}">${t('theme.' + name)}</button>`,
+  ).join('');
   $('goalTabs').innerHTML = GOAL_OPTIONS_MIN.map(
     (m) =>
       `<button class="chip${m === G.state.goalMin ? ' on' : ''}" data-goal="${m}">${t('unit.min', { m })}</button>`,
@@ -30,7 +36,7 @@ function onSwitchChange(el) {
   G.settings[name] = el.checked;
   saveSettings(G.settings);
   if (name === 'keepAwake') applyAwake();
-  if (name === 'notify' && el.checked) native.ensureNotifyPermission();
+  if ((name === 'notify' || name === 'ongoing') && el.checked) native.ensureNotifyPermission();
 }
 
 /**
@@ -38,6 +44,14 @@ function onSwitchChange(el) {
  * onGoalChanged runs after the daily goal was changed.
  */
 export function initSettings({ onLanguageChanged, onGoalChanged }) {
+  $('themeTabs').addEventListener('click', (e) => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    G.settings.theme = chip.dataset.themeChoice;
+    saveSettings(G.settings);
+    applyTheme();
+    renderSettings();
+  });
   $('goalTabs').addEventListener('click', (e) => {
     const chip = e.target.closest('.chip');
     if (!chip) return;

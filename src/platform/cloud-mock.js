@@ -29,8 +29,26 @@ function load() {
       ploy: { uid: 'ploy', email: 'ploy@example.com', pw: 'password', name: 'Ploy', verified: true },
     },
     profiles: {
-      mint: { name: 'Mint', code: 'MNT234', totalMin: 1260, todayMin: 45, dayKey: '', weekMin: 310, streak: 4 },
-      ploy: { name: 'Ploy', code: 'PLY567', totalMin: 95, todayMin: 0, dayKey: '', weekMin: 95, streak: 0 },
+      mint: {
+        name: 'Mint',
+        avatar: 'cat',
+        code: 'MNT234',
+        totalMin: 1260,
+        todayMin: 45,
+        dayKey: '',
+        weekMin: 310,
+        streak: 4,
+      },
+      ploy: {
+        name: 'Ploy',
+        avatar: 'frog',
+        code: 'PLY567',
+        totalMin: 95,
+        todayMin: 0,
+        dayKey: '',
+        weekMin: 95,
+        streak: 0,
+      },
     },
     backups: {},
     requests: {},
@@ -188,7 +206,7 @@ export async function findUser(input) {
   }
   return uid ? { uid, name: S.profiles[uid].name, code: S.profiles[uid].code } : null;
 }
-export async function sendRequest(target, myName, myCode) {
+export async function sendRequest(target, myName, myCode, myAvatar = '') {
   await wait();
   const uid = S.session;
   S.requests[`${uid}_${target.uid}`] = {
@@ -196,6 +214,7 @@ export async function sendRequest(target, myName, myCode) {
     to: target.uid,
     fromName: myName,
     fromCode: myCode,
+    fromAvatar: myAvatar,
     toName: target.name,
     toCode: target.code || '',
   };

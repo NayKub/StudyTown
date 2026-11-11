@@ -1,4 +1,4 @@
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin, SystemBars, SystemBarsStyle } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { LocalNotifications } from '@capacitor/local-notifications';
@@ -8,6 +8,40 @@ import { SplashScreen } from '@capacitor/splash-screen';
 export const isNative = Capacitor.isNativePlatform();
 const NOTIF_ID = 1;
 const quiet = (p) => Promise.resolve(p).catch(() => {});
+
+// Our own native plugin (android/.../StudyNotificationPlugin.java, ios/App/App/StudyNotificationPlugin.swift):
+// the ongoing "studying" notification on Android, a Live Activity on iPhone.
+const StudyNotification = registerPlugin('StudyNotification');
+
+/**
+ * Show (or update) the ongoing study notification while the app is closed.
+ * session = { endsAt (ms), paused, remaining ('12:34'), title, text, appName }
+ */
+export function showOngoing(session) {
+  if (isNative) quiet(StudyNotification.show(session));
+}
+export function hideOngoing() {
+  if (isNative) quiet(StudyNotification.hide());
+}
+
+/** Light or dark text in the status bar, to match the theme. */
+export function setBarsDark(dark) {
+  if (isNative) quiet(SystemBars.setStyle({ style: dark ? SystemBarsStyle.Dark : SystemBarsStyle.Light }));
+}
+/** Hide the status and navigation bars (full clear) or bring them back. */
+export function setBarsHidden(hidden) {
+  if (isNative) quiet(hidden ? SystemBars.hide() : SystemBars.show());
+}
+
+/** Android back button. handler() returns true when it dealt with the press. */
+export function onBackButton(handler) {
+  if (!isNative) return;
+  quiet(
+    App.addListener('backButton', () => {
+      if (!handler()) App.exitApp();
+    }),
+  );
+}
 
 export function hideSplash() {
   if (isNative) quiet(SplashScreen.hide());

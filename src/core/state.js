@@ -10,6 +10,7 @@ export const G = {
     sessions: [],
     timer: null,
     choices: {}, // plot index -> kind the player chose to build
+    profile: { avatar: '', photo: '', at: 0 }, // profile picture: a preset animal or a photo; `at` = when it changed
     chooseFrom: null, // first plot index that waits for a choice (null until set at first launch)
     badges: {}, // achievement id -> when it was earned
     goalMin: 60, // daily goal in minutes
@@ -17,7 +18,7 @@ export const G = {
     flags: {}, // one-off things the player has done, e.g. { visited: true }
     v: 3,
   },
-  settings: { lang: null, keepAwake: false, sound: true, haptics: true, notify: true },
+  settings: { lang: null, keepAwake: false, sound: true, haptics: true, notify: true, ongoing: true, theme: 'system' },
   /** The study session in progress. `before` = seconds counted before the last resume. */
   timer: {
     dur: 25 * 60,

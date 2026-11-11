@@ -14,6 +14,12 @@ One codebase, three targets: web, Android and iOS, using [Capacitor](https://cap
 - Daily goal with a forgiving streak (one rest day does not break it)
 - 23 achievements with a trophy shelf
 - Time-lapse that replays your town growing from empty land to today
+- Profile picture: one of the town's animals, or your own photo (resized small and stored with your profile)
+- Visiting a friend shows their details (time studied, streak, badges) in place of your timer
+- Light, dark or system theme
+- Full clear: the town fills the whole screen (press F on a computer; Esc or the corner button to leave)
+- While a session runs and the app is closed: a live countdown notification on Android and a
+  Live Activity on the iPhone lock screen and Dynamic Island
 - Thai and English (i18next), switchable in Settings
 - Works fully as a guest, with all data stored on the device
 - Optional account (Firebase): email sign-up and log-in, password reset, email verification,
@@ -63,7 +69,7 @@ src/
       friendsCard.js       requests, friends list, visits
       sync.js              automatic cloud backup between devices
   platform/                everything that talks to the outside world
-    native.js              notifications, haptics, keep awake, app state
+    native.js              notifications, haptics, keep awake, app state; StudyNotification plugin
     storage.js             on-device storage (Capacitor Preferences)
     cloud.js               Firebase: auth, backup, friends
     cloud-mock.js          in-memory stand-in for cloud.js (`npm run dev:mock`)
@@ -120,8 +126,9 @@ Without this the app runs in guest-only mode and hides the account features.
 4. **Firestore > Rules**: replace everything with the contents of `firestore.rules`, then **Publish**.
 5. **Project settings (gear) > General > Your apps > Web (`</>`)**: register an app (no hosting),
    then copy the `firebaseConfig` values into `src/firebase-config.js`.
-6. Optional: **Authentication > Templates** to change the sender name and language of the
-   verification and password-reset emails.
+
+Whenever `firestore.rules` changes, publish it again (step 4). Version 1.5.0 added profile pictures to the rules. 6. Optional: **Authentication > Templates** to change the sender name and language of the
+verification and password-reset emails.
 
 Do not add API key restrictions by HTTP referrer: the iOS app runs from `capacitor://localhost`.
 
@@ -152,8 +159,10 @@ To regenerate the icon and splash screen after editing `assets/logo.png`: `npm r
    after the app is published.
 2. **Android.** Create a signing key, build a release bundle in Android Studio
    (Build > Generate Signed App Bundle) and upload it in the Google Play Console.
-3. **iOS.** Open `ios/App/App.xcodeproj` in Xcode, choose your team under Signing & Capabilities,
-   then Product > Archive and upload to App Store Connect. This needs an Apple Developer account.
+3. **iOS.** Open `ios/App/App.xcodeproj` in Xcode, choose your team under Signing & Capabilities
+   for both targets (**App** and **StudyWidgetExtension**, the Live Activity), then Product > Archive
+   and upload to App Store Connect. This needs an Apple Developer account. The widget's bundle id is
+   the app's id followed by `.StudyWidget`; change both together.
 
 ## Notes and known limits
 

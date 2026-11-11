@@ -28,6 +28,17 @@ test('profiles: owner writes, strangers cannot read, friends can', async () => {
   await assertSucceeds(getDoc(doc(as('bob'), 'profiles/alice')));
 });
 
+test('profile pictures: small JPEG photos and short avatar ids only', async () => {
+  const base = { name: 'Alice', code: 'AAAAAA', totalMin: 0 };
+  const photo = 'data:image/jpeg;base64,' + 'A'.repeat(1000);
+  await assertSucceeds(setDoc(doc(as('alice'), 'profiles/alice'), { ...base, avatar: 'cat', photo }));
+  await assertSucceeds(setDoc(doc(as('alice'), 'profiles/alice'), { ...base, avatar: '', photo: '' }));
+  await assertFails(setDoc(doc(as('alice'), 'profiles/alice'), { ...base, photo: 'javascript:alert(1)' }));
+  await assertFails(setDoc(doc(as('alice'), 'profiles/alice'), { ...base, photo: 'data:image/svg+xml;base64,AAAA' }));
+  await assertFails(setDoc(doc(as('alice'), 'profiles/alice'), { ...base, photo: photo + 'A'.repeat(40000) }));
+  await assertFails(setDoc(doc(as('alice'), 'profiles/alice'), { ...base, avatar: 'x'.repeat(50) }));
+});
+
 test('codes and emails: exact get only, no listing, no hijacking', async () => {
   await assertSucceeds(setDoc(doc(as('alice'), 'codes/ABC234'), { uid: 'alice', name: 'Alice' }));
   await assertFails(setDoc(doc(as('bob'), 'codes/ABC234'), { uid: 'bob', name: 'Bob' }));

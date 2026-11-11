@@ -37,7 +37,15 @@ function setSync(status, e) {
 /** A cheap fingerprint of the saved data: enough to tell "same" from "something new". */
 const count = (obj) => Object.keys(obj || {}).length;
 const sig = (st) =>
-  [st.totalSec, count(st.days), (st.sessions || []).length, count(st.choices), count(st.badges), st.goalMin].join('|');
+  [
+    st.totalSec,
+    count(st.days),
+    (st.sessions || []).length,
+    count(st.choices),
+    count(st.badges),
+    st.goalMin,
+    (st.profile || {}).at || 0,
+  ].join('|');
 /** The public stats include "minutes today", so a new day also needs an upload. */
 const pushKey = (st) => sig(st) + '|' + todayKey();
 

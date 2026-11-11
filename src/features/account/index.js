@@ -29,6 +29,11 @@ export function initAccount(hooks) {
   renderFriends();
 }
 
+/** Your picture changed on another device: show it on the profile button and sheet. */
+export function refreshProfile() {
+  renderAccount();
+}
+
 export function onLanguageChange() {
   if (cloud.setLanguage) cloud.setLanguage(lang()); // language of the emails Firebase sends
   renderAccount();

@@ -141,7 +141,9 @@
     "haptics": "Vibrate on new buildings",
     "notify": "Notify when time is up",
     "version": "Version {{v}}",
-    "goal": "Daily goal"
+    "goal": "Daily goal",
+    "theme": "Theme",
+    "ongoing": "Show the timer while the app is closed"
   },
   "notif": {
     "title": "Time's up",
@@ -151,7 +153,9 @@
     "log": "Study log",
     "settings": "Settings",
     "close": "Close",
-    "account": "Account"
+    "account": "Account",
+    "full": "Full screen town",
+    "fullExit": "Exit full screen"
   },
   "sheet": {
     "more": "Swipe up for more",
@@ -159,13 +163,13 @@
   },
   "visit": {
     "title": "{{name}}'s town",
-    "back": "Back to mine",
-    "locked": "The timer only works in your own town."
+    "back": "Back to my town",
+    "backShort": "Back",
+    "week": "This week",
+    "badges": "Badges"
   },
   "friends": {
     "title": "Friends",
-    "guest": "Log in to add friends, visit their towns and back up your own town. You can keep using the app as a guest.",
-    "loginBtn": "Log in or sign up",
     "placeholder": "Friend code or email",
     "add": "Add",
     "myCode": "My friend code",
@@ -370,5 +374,25 @@
       "name": "Good neighbour",
       "desc": "Visit a friend's town"
     }
+  },
+  "pic": {
+    "change": "Change picture",
+    "done": "Done",
+    "upload": "Upload a photo",
+    "remove": "Remove photo",
+    "saved": "Profile picture updated.",
+    "error": "That image couldn't be used. Try a JPEG or PNG photo."
+  },
+  "theme": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "ongoing": {
+    "studying": "Studying",
+    "paused": "Paused",
+    "endsAt": "Ends at {{time}}",
+    "left": "{{time}} left",
+    "channel": "Study session"
   }
 }

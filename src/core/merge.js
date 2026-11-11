@@ -35,6 +35,10 @@ export function mergeStates(local, remote) {
   sessions.sort((a, b) => a.at - b.at);
   const sum = Object.values(days).reduce((a, b) => a + b, 0);
   const goalHitDay = [local.goalHitDay || '', remote.goalHitDay || ''].sort().pop();
+  // the profile picture changed most recently wins, whichever device it was changed on
+  const lp = local.profile || {};
+  const rp = remote.profile || {};
+  const profile = (rp.at || 0) > (lp.at || 0) ? rp : lp;
   return {
     ...local,
     days,
@@ -47,5 +51,6 @@ export function mergeStates(local, remote) {
     flags: { ...(remote.flags || {}), ...(local.flags || {}) },
     goalMin: local.goalMin || remote.goalMin || 60,
     goalHitDay,
+    profile: { avatar: profile.avatar || '', photo: profile.photo || '', at: profile.at || 0 },
   };
 }

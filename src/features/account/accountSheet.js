@@ -5,7 +5,10 @@ import { $, esc, toast, showModal, hideModal } from '../../ui/dom.js';
 import { icon } from '../../ui/icons.js';
 import { session } from './session.js';
 import { sync, syncStatus } from './sync.js';
-import { avatar, copyCode } from './shared.js';
+import { avatar, copyCode, photoFromFile } from './shared.js';
+import { G } from '../../core/state.js';
+import { AVATAR_IDS } from '../../render/avatars.js';
+import { saveNow } from '../persistence.js';
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const MIN_PASSWORD = 6;
@@ -29,6 +32,7 @@ let tab = 'login'; // which form a guest sees: login | signup
 let busy = false; // a request is in flight
 let msg = { text: '', kind: '' }; // message under the form (may contain our own HTML)
 let showDelete = false; // the "delete account" confirmation is open
+let showPicker = false; // the profile picture chooser is open
 const typed = { name: '', email: '', password: '' }; // what the user typed, kept across re-renders
 
 const clearMsg = () => {
@@ -48,11 +52,14 @@ export function initAccountSheet() {
   modal.addEventListener('submit', onSubmit);
   modal.addEventListener('click', onClick);
   modal.addEventListener('input', rememberTyping);
+  modal.addEventListener('change', onPhotoPicked);
+  renderAccountButton();
 }
 
 export function openAccount() {
   clearMsg();
   showDelete = false;
+  showPicker = false;
   renderAccount();
   showModal('accountModal');
 }
@@ -66,7 +73,7 @@ function rememberTyping(e) {
 export function renderAccount() {
   if (!cloud.isConfigured) return;
   const { user } = session;
-  $('accountBtn').classList.toggle('in', !!user);
+  renderAccountButton();
   $('accTitle').textContent = user ? t('acc.title') : t(tab === 'login' ? 'acc.login' : 'acc.signup');
   const note = msg.text ? `<p class="formMsg ${msg.kind}">${msg.text}</p>` : '';
   $('accBody').innerHTML = user ? memberView(user, note) : guestView(note);
@@ -115,9 +122,38 @@ function deleteView() {
         <div class="btns"><button class="btn ghost" type="button" data-act="cancelDelete">${t('acc.cancel')}</button><button class="btn red" type="submit" ${busy ? 'disabled' : ''}>${t('acc.deleteConfirm')}</button></div></form>`;
 }
 
+const myPicture = () => ({ name: session.user.name, uid: session.user.uid, ...G.state.profile });
+
+let shownButton = '';
+/** The round profile button on the town: your picture once logged in, an outline figure before. */
+export function renderAccountButton() {
+  const html = session.user ? avatar(myPicture(), 'btn') : icon('user');
+  $('accountBtn').classList.toggle('in', !!session.user);
+  if (html === shownButton) return; // a photo is large; don't re-insert it on every render
+  shownButton = html;
+  $('accountBtn').innerHTML = html;
+}
+
+function pickerView() {
+  if (!showPicker) return '';
+  const current = G.state.profile;
+  const choices = AVATAR_IDS.map(
+    (id) =>
+      `<button class="picChoice${!current.photo && current.avatar === id ? ' on' : ''}" data-act="setAvatar" data-id="${id}" aria-label="${id}">${avatar({ avatar: id }, 'lg')}</button>`,
+  ).join('');
+  return `<div class="picker">
+      <div class="picGrid">${choices}</div>
+      <div class="picActions">
+        <label class="btn ghost picUpload">${icon('image')}<span>${t('pic.upload')}</span><input type="file" accept="image/*" id="photoInput" hidden></label>
+        ${current.photo ? `<button class="linkbtn" data-act="removePhoto">${t('pic.remove')}</button>` : ''}
+      </div>
+    </div>`;
+}
+
 function memberView(user, note) {
   return `
-    <div class="me">${avatar(user.name, user.uid)}<div><b>${esc(user.name)}</b><small>${esc(user.email)}</small></div></div>
+    <div class="me"><button class="picBtn" data-act="togglePicker" aria-label="${t('pic.change')}">${avatar(myPicture(), 'lg')}<span class="picEdit">${icon('image')}</span></button><div><b>${esc(user.name)}</b><small>${esc(user.email)}</small><button class="linkbtn" data-act="togglePicker">${t(showPicker ? 'pic.done' : 'pic.change')}</button></div></div>
+    ${pickerView()}
     ${verifyView(user)}
     <div class="codeBox"><small>${t('friends.myCode')}</small><b>${cloud.fmtCode(user.code)}</b><button class="chip" data-act="copyCode">${t('friends.copy')}</button></div>
     ${syncView()}
@@ -185,7 +221,41 @@ function submitDelete(value) {
   });
 }
 
+/** Store a new picture: it syncs to your other devices and is shown to your friends. */
+function setPicture(avatarId, photo) {
+  G.state.profile = { avatar: avatarId || '', photo: photo || '', at: Date.now() };
+  saveNow();
+  sync(true);
+  renderAccount();
+}
+
+async function onPhotoPicked(e) {
+  if (e.target.id !== 'photoInput') return;
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  try {
+    const photo = await photoFromFile(file);
+    clearMsg();
+    setPicture(G.state.profile.avatar, photo);
+    toast(t('pic.saved'));
+  } catch {
+    say(t('pic.error'), 'err');
+    renderAccount();
+  }
+}
+
 const ACTIONS = {
+  togglePicker() {
+    showPicker = !showPicker;
+    renderAccount();
+  },
+  setAvatar(el) {
+    setPicture(el.dataset.id, '');
+    toast(t('pic.saved'));
+  },
+  removePhoto() {
+    setPicture(G.state.profile.avatar, '');
+  },
   forgot() {
     const input = $('accBody').querySelector('input[name=email]');
     const email = ((input && input.value) || '').trim();
@@ -242,5 +312,5 @@ function onClick(e) {
     return;
   }
   const action = ACTIONS[el.dataset.act];
-  if (action) action();
+  if (action) action(el);
 }

@@ -76,4 +76,16 @@ describe('merging two devices', () => {
     );
     expect(merged.badges).toEqual({ first: 100, h1: 300, early: 400 });
   });
+
+  it('keeps the profile picture changed most recently, on either device', () => {
+    const older = { totalSec: 0, days: {}, profile: { avatar: 'cat', photo: '', at: 100 } };
+    const newer = { totalSec: 0, days: {}, profile: { avatar: 'frog', photo: '', at: 200 } };
+    expect(mergeStates(older, newer).profile.avatar).toBe('frog');
+    expect(mergeStates(newer, older).profile.avatar).toBe('frog');
+    expect(mergeStates({ totalSec: 0, days: {} }, { totalSec: 0, days: {} }).profile).toEqual({
+      avatar: '',
+      photo: '',
+      at: 0,
+    });
+  });
 });
