@@ -1884,3 +1884,443 @@ body.fullClear .fullTimer:not([hidden]) {
     transition: none;
   }
 }
+
+/* ---------- IQ, shop and bag ---------- */
+.iqChip {
+  height: 44px;
+  min-width: 44px;
+  padding: 0 12px;
+  border-radius: 22px;
+  border: 2px solid var(--line);
+  background: var(--glass);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 800;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 3px;
+  line-height: 40px;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+.iqChip small {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--pinkd);
+  letter-spacing: 0.02em;
+}
+.iqChip:active {
+  transform: translateY(1px);
+}
+.badge {
+  max-width: calc(100% - 330px); /* the IQ chip and four round buttons on the right */
+}
+.noCloud .badge {
+  max-width: calc(100% - 270px);
+}
+/* phones: the IQ chip sits under the round buttons so the town name keeps its room */
+@media (max-width: 899px) {
+  .iqChip {
+    position: absolute;
+    top: 52px;
+    right: 0;
+    height: 34px;
+    line-height: 30px;
+    font-size: 14px;
+    padding: 0 10px;
+  }
+  .badge {
+    max-width: calc(100% - 244px);
+  }
+  .noCloud .badge {
+    max-width: calc(100% - 190px);
+  }
+}
+@media (max-width: 380px) {
+  .iqChip {
+    top: 48px;
+  }
+  .badge {
+    max-width: calc(100% - 214px);
+  }
+}
+body.visiting .iqChip,
+body.fullClear .iqChip {
+  display: none;
+}
+
+.shopIQ {
+  margin-left: auto;
+  font-weight: 800;
+  font-size: 15px;
+  padding: 4px 12px;
+  border-radius: 99px;
+  background: var(--tint);
+  border: 2px solid var(--line);
+  white-space: nowrap;
+}
+#shopTabs {
+  margin-bottom: 6px;
+}
+#shopTabs .chip .ico {
+  margin-right: 4px;
+}
+.shopH {
+  font-size: 15px;
+  margin: 18px 2px 8px;
+}
+.itemGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+.itemGrid:empty::before {
+  content: '';
+  display: none;
+}
+.itemList {
+  display: grid;
+  gap: 10px;
+}
+.itemTile {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 6px;
+  border-radius: 16px;
+  border: 2px solid var(--line);
+  background: var(--tint);
+  text-align: center;
+}
+.itemTile.wide {
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 12px;
+}
+.itemTile .sw {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.itemTile .sw svg {
+  width: 100%;
+  max-width: 76px;
+  height: auto;
+  display: block;
+}
+.itemTile.wide .sw {
+  flex: none;
+}
+.itemIcon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  font-size: 26px;
+}
+.itemIcon.it-thunder {
+  color: #6b78a8;
+}
+.itemIcon.it-shield {
+  color: #4a97d6;
+}
+.have {
+  position: absolute;
+  right: -6px;
+  top: -6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 11px;
+  background: var(--pink);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 22px;
+}
+.itemInfo {
+  flex: 1;
+  min-width: 0;
+}
+.itemInfo b {
+  display: block;
+  font-size: 13px;
+}
+.itemTile.wide .itemInfo b {
+  font-size: 14px;
+}
+.itemInfo small {
+  display: block;
+  color: var(--soft);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.itemBtn {
+  border: 2px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 4px 8px;
+  min-height: 32px;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.itemTile.wide .itemBtn {
+  flex: none;
+}
+.itemBtn.price {
+  background: var(--pink);
+  border-color: var(--pinkd);
+  color: #fff;
+}
+.itemBtn.sure {
+  background: var(--yellow);
+  border-color: #e9b94a;
+  color: #4a2b3a;
+}
+.itemBtn.on {
+  color: var(--ok);
+  background: var(--okbg);
+  border-color: transparent;
+  cursor: default;
+}
+.itemBtn:disabled:not(.on) {
+  opacity: 0.5;
+  cursor: default;
+}
+.btn.small {
+  flex: none;
+  min-height: 36px;
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 12px;
+  box-shadow: 0 3px 0 var(--pinkd);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* damaged buildings: the note above the timer and in the shop */
+.repairCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-color: #f2c3a0;
+  background: var(--warnbg);
+}
+.repairCard[hidden] {
+  display: none;
+}
+.repairText {
+  flex: 1;
+  min-width: 0;
+}
+.repairText b,
+.repairBox b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+.repairText small,
+.repairBox small {
+  display: block;
+  color: var(--soft);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.repairBox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--warnbg);
+  border: 2px solid #f2c3a0;
+  margin-top: 8px;
+}
+.repairBox > .ico {
+  font-size: 22px;
+  flex: none;
+}
+.repairBox > div {
+  flex: 1;
+}
+
+/* throwing bombs from a friend's panel */
+.attackBox {
+  margin: 12px 0;
+}
+.attackBtn {
+  width: 100%;
+  background: #6b5a7a;
+  box-shadow: 0 4px 0 #4f415c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.attackBtn:active {
+  box-shadow: 0 1px 0 #4f415c;
+}
+.attackNote {
+  text-align: center;
+}
+.bombPick {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 8px;
+}
+.bombChoice {
+  border: 2px solid var(--line);
+  background: var(--tint);
+  border-radius: 14px;
+  padding: 8px 6px;
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.bombChoice .ico {
+  font-size: 26px;
+}
+.bombChoice b {
+  font-size: 13px;
+}
+.bombChoice small {
+  font-size: 11px;
+  color: var(--soft);
+}
+.bombChoice:disabled {
+  opacity: 0.5;
+}
+
+/* "Your town was attacked!" */
+.attackCard {
+  text-align: left;
+}
+#attackModal .attackCard {
+  max-width: 360px;
+}
+.attackCard h2 {
+  margin: 0 0 12px;
+  font-size: 19px;
+}
+.hitLine {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 2px dashed var(--line);
+  font-size: 14px;
+  line-height: 1.45;
+}
+.hitLine .linkbtn {
+  display: block;
+  padding: 2px 0 0;
+}
+.attackSum {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 12px 0;
+}
+.attackBtns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.attackBtns .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+#attackBody > .linkbtn {
+  display: block;
+  margin: 10px auto 0;
+}
+.setNote {
+  display: block;
+  font-size: 12px;
+  color: var(--soft);
+  margin-top: 2px;
+}
+
+/* ---------- card skins (bought in the shop) ---------- */
+:root[data-skin='mint'] {
+  --card: #f3fbf5;
+  --line: #d3ecdb;
+  --tint: #e9f7ee;
+}
+:root[data-skin='lavender'] {
+  --card: #f8f4ff;
+  --line: #e4daf8;
+  --tint: #efe8ff;
+}
+:root[data-skin='notebook'] {
+  --card: #fffef7;
+  --line: #dbe4f0;
+  --tint: #f6f8fc;
+}
+:root[data-skin='kraft'] {
+  --card: #f4e5c9;
+  --line: #dcc49b;
+  --tint: #f9eedb;
+  --surface: #fdf6e8;
+}
+:root[data-theme='dark'][data-skin='mint'] {
+  --card: #22302a;
+  --line: #34493d;
+  --tint: #2a3b32;
+}
+:root[data-theme='dark'][data-skin='lavender'] {
+  --card: #2b2538;
+  --line: #443a5a;
+  --tint: #342c45;
+}
+:root[data-theme='dark'][data-skin='notebook'] {
+  --card: #262a33;
+  --line: #3a4252;
+  --tint: #2d323d;
+}
+:root[data-theme='dark'][data-skin='kraft'] {
+  --card: #392f24;
+  --line: #54452f;
+  --tint: #43382a;
+  --surface: #3f3427;
+}
+/* lined paper with a red margin, under everything in the card */
+:root[data-skin='notebook'] .side .card {
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 22px,
+      rgba(243, 140, 160, 0.45) 22px,
+      rgba(243, 140, 160, 0.45) 24px,
+      transparent 24px
+    ),
+    repeating-linear-gradient(180deg, transparent 0 25px, rgba(150, 180, 220, 0.3) 25px 26px);
+}
+/* brown paper with a stitched edge */
+:root[data-skin='kraft'] .side .card {
+  outline: 2px dashed rgba(150, 110, 60, 0.45);
+  outline-offset: -8px;
+}

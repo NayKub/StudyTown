@@ -7,6 +7,10 @@ service cloud.firestore {
     function shortText(v, n) { return v is string && v.size() <= n; }
     // profile pictures: a preset animal id, and a small JPEG data URL (or empty)
     function okAvatar(d) { return shortText(d.get('avatar', ''), 12); }
+    function peaceful(uid) {
+      let p = /databases/$(database)/documents/profiles/$(uid);
+      return exists(p) && get(p).data.get('peaceful', false) == true;
+    }
     function okPhoto(d) {
       let p = d.get('photo', '');
       return p is string && p.size() < 40000 && (p == '' || p.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+'));
@@ -62,6 +66,27 @@ service cloud.firestore {
         && !areFriends(request.auth.uid, request.resource.data.to)
         && shortText(request.resource.data.fromName, 40) && shortText(request.resource.data.toName, 40)
         && shortText(request.resource.data.get('fromAvatar', ''), 12);
+      allow delete: if signedIn() && (resource == null || resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+    }
+
+    // Bombs thrown at friends. Document id is "{from}_{to}_{day}" (UTC day number), so a friend can
+    // be attacked once a day: a second write to the same id is an update, which is never allowed.
+    // People in peaceful mode can't be attacked. The target applies the damage and deletes it.
+    match /attacks/{id} {
+      allow get: if signedIn() && (resource == null || resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
+      allow list: if signedIn() && resource.data.to == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.from == request.auth.uid
+        && request.resource.data.to is string
+        && request.resource.data.to != request.auth.uid
+        && request.resource.data.day == math.floor(request.time.toMillis() / 86400000)
+        && id == request.auth.uid + '_' + request.resource.data.to + '_' + string(request.resource.data.day)
+        && request.resource.data.item in ['mini', 'big', 'thunder']
+        && areFriends(request.auth.uid, request.resource.data.to)
+        && !peaceful(request.resource.data.to)
+        && shortText(request.resource.data.fromName, 40)
+        && shortText(request.resource.data.get('fromAvatar', ''), 12);
+      allow update: if false;
       allow delete: if signedIn() && (resource == null || resource.data.from == request.auth.uid || resource.data.to == request.auth.uid);
     }
 

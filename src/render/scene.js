@@ -5,7 +5,9 @@ import { plots, cityAt, kindOf } from '../core/city.js';
 import { t } from '../i18n/index.js';
 import { iso } from './primitives.js';
 import { applyCamera, bindCameraInput, resize } from './camera.js';
-import { drawSky, timeOfDay } from './sky.js';
+import { drawSky } from './sky.js';
+import { skyState, shownTrouble } from './looks.js';
+import { drawDamage, startDamaged, endDamaged, stillFalling, drawBlasts, drawShield, drawWeather } from './effects.js';
 import { drawGround } from './ground.js';
 import { drawPlot } from './buildings.js';
 import { residents, setTown, syncResidents, updateResidents, drawResident } from './residents.js';
@@ -49,8 +51,9 @@ function frame(now) {
   syncResidents(false);
   updateResidents(dt);
 
-  const sky = timeOfDay();
-  drawSky(now, sky);
+  const sky = skyState();
+  const trouble = shownTrouble();
+  drawSky(now, sky, trouble.rain);
   applyCamera(city.R);
   drawGround(city.R, minutes);
 
@@ -60,10 +63,24 @@ function frame(now) {
   for (let i = 0; i < city.n; i++) {
     const p = plots[i];
     const kind = kindOf(p, buildings);
-    things.push({ depth: p.x + p.y, draw: () => drawPlot(p, minutes, sky.night, now, kind) });
+    const hurt = trouble.plots.has(i) && !stillFalling(i, now);
+    things.push({
+      depth: p.x + p.y,
+      draw: () => {
+        if (hurt) startDamaged();
+        drawPlot(p, minutes, sky.night, now, kind);
+        if (hurt) {
+          endDamaged();
+          drawDamage(p, now);
+        }
+      },
+    });
   }
   for (const c of residents) things.push({ depth: c.x + c.y + 0.3, draw: () => drawResident(c, now) });
   things.sort((a, b) => a.depth - b.depth).forEach((thing) => thing.draw());
+  if (trouble.shield) drawShield(now, city.R);
+  drawBlasts(now, city.R);
+  drawWeather(now, { rain: trouble.rain, petalsFall: sky.sky === 'petals' });
 
   requestAnimationFrame(frame);
 }

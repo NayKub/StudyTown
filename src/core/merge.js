@@ -1,4 +1,5 @@
 import { cityAt } from './city.js';
+import { mergeShop } from './wallet.js';
 
 /** Plots from this index on wait for the player's choice. Backups made before choosing existed have none. */
 const chooseFromOf = (state) =>
@@ -52,5 +53,6 @@ export function mergeStates(local, remote) {
     goalMin: local.goalMin || remote.goalMin || 60,
     goalHitDay,
     profile: { avatar: profile.avatar || '', photo: profile.photo || '', at: profile.at || 0 },
+    ...mergeShop(local, remote),
   };
 }

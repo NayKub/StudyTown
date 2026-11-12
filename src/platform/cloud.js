@@ -7,6 +7,7 @@
 //   codes/{CODE}              uid, name        exact lookup only, no listing
 //   emails/{email}            uid, name        exact lookup only, no listing
 //   backups/{uid}             state (JSON string), updatedAt                                    (owner only)
+//   attacks/{from}_{to}_{day} from, to, item, fromName, fromAvatar, day, at  (one per friend per UTC day)
 //   requests/{from}_{to}      from, to, fromName, fromCode, toName, toCode, createdAt            (sender + receiver)
 //   friends/{uid}/list/{fid}  name, since                                                        (owner reads, either side deletes)
 import { Capacitor } from '@capacitor/core';
@@ -374,4 +375,36 @@ export function watchSocial(cb) {
     subs.forEach((f) => f());
     Object.values(profSubs).forEach((f) => f());
   };
+}
+
+// ---------- attacks ----------
+
+/** Throw a bomb at a friend. Refused (permission-denied) if one was already thrown at them today. */
+export async function sendAttack(target, item, myName, myAvatar, day) {
+  const uid = me().uid;
+  const id = `${uid}_${target}_${day}`;
+  await setDoc(doc(db, 'attacks', id), {
+    from: uid,
+    to: target,
+    item,
+    fromName: myName || '',
+    fromAvatar: myAvatar || '',
+    day,
+    at: serverTimestamp(),
+  });
+  return id;
+}
+
+/** Live list of bombs thrown at you that this account hasn't cleared yet. cb([{ id, ... }]). */
+export function watchAttacks(cb) {
+  return onSnapshot(
+    query(collection(db, 'attacks'), where('to', '==', me().uid)),
+    (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }))),
+    () => {},
+  );
+}
+
+/** Remove an attack once it has been applied to the town. */
+export function clearAttack(id) {
+  return deleteDoc(doc(db, 'attacks', id)).catch(() => {});
 }

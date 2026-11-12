@@ -28,6 +28,7 @@ export function renderSettings() {
   switches().forEach((el) => {
     el.checked = !!G.settings[el.dataset.setting];
   });
+  $('peacefulSwitch').checked = !!G.state.peaceful;
   $('version').textContent = t('settings.version', { v: __APP_VERSION__ });
 }
 
@@ -42,8 +43,16 @@ function onSwitchChange(el) {
 /**
  * onLanguageChanged runs after the new language is loaded, to redraw every text on screen.
  * onGoalChanged runs after the daily goal was changed.
+ * onPeacefulChanged runs after peaceful mode was switched.
  */
-export function initSettings({ onLanguageChanged, onGoalChanged }) {
+export function initSettings({ onLanguageChanged, onGoalChanged, onPeacefulChanged }) {
+  // peaceful mode follows the account (friends' apps need to see it), so it lives in the saved state
+  $('peacefulSwitch').addEventListener('change', (e) => {
+    G.state.peaceful = e.target.checked;
+    G.state.peacefulAt = Date.now();
+    saveNow();
+    onPeacefulChanged();
+  });
   $('themeTabs').addEventListener('click', (e) => {
     const chip = e.target.closest('.chip');
     if (!chip) return;

@@ -7,6 +7,7 @@ import { icon } from '../ui/icons.js';
 import * as native from '../platform/native.js';
 import { saveNow } from './persistence.js';
 import { session } from './account/session.js';
+import { badgeBonus } from './shop/economy.js';
 
 const SHELF_SIZE = 6; // how many of the latest badges the side panel shows
 let onEarned = () => {};
@@ -23,6 +24,7 @@ export function checkAchievements() {
   ids.forEach((id) => {
     G.state.badges[id] = now;
   });
+  badgeBonus(ids);
   // several at once (e.g. the first launch after an update): one message instead of a flood
   if (ids.length > 2) toast(t('ach.many', { count: ids.length }));
   else ids.forEach((id) => toast(t('ach.unlocked', { name: t(`ach.${id}.name`) })));

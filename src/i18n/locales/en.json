@@ -143,7 +143,9 @@
     "version": "Version {{v}}",
     "goal": "Daily goal",
     "theme": "Theme",
-    "ongoing": "Show the timer while the app is closed"
+    "ongoing": "Show the timer while the app is closed",
+    "peaceful": "Peaceful mode",
+    "peacefulNote": "No bombs: you can't throw them and nobody can throw them at you."
   },
   "notif": {
     "title": "Time's up",
@@ -394,5 +396,148 @@
     "endsAt": "Ends at {{time}}",
     "left": "{{time}} left",
     "channel": "Study session"
+  },
+  "shop": {
+    "title": "Shop",
+    "open": "Shop, you have {{iq}} IQ",
+    "tab": {
+      "shop": "Shop",
+      "bag": "Bag"
+    },
+    "price": "{{iq}} IQ",
+    "sure": "Buy for {{iq}} IQ?",
+    "use": "Use",
+    "inUse": "In use",
+    "have": "×{{count}}",
+    "ground": "Town themes",
+    "sky": "Skies",
+    "card": "Card skins",
+    "fight": "Bombs and shields",
+    "fightHint": "Throw bombs at friends' towns from their page. A shield keeps your own town safe.",
+    "peaceful": "Peaceful",
+    "peacefulNote": "Peaceful mode is on, so you can't buy bombs. You can turn it off in Settings.",
+    "poor": "Not enough IQ yet. Study to earn more: 1 minute = 1 IQ.",
+    "owned": "You already have that.",
+    "bought": "Bought: {{name}}. It's in your bag.",
+    "boughtLook": "{{name}} is on. Enjoy!"
+  },
+  "bag": {
+    "bombHint": "To throw one, visit a friend's town from your profile.",
+    "noBombs": "No bombs or shields yet. You can buy them in the Shop."
+  },
+  "item": {
+    "meadow": {
+      "name": "Meadow"
+    },
+    "autumn": {
+      "name": "Autumn"
+    },
+    "snow": {
+      "name": "Snow"
+    },
+    "sakura": {
+      "name": "Sakura"
+    },
+    "desert": {
+      "name": "Desert"
+    },
+    "live": {
+      "name": "Real time"
+    },
+    "sunset": {
+      "name": "Sunset"
+    },
+    "starry": {
+      "name": "Starry night"
+    },
+    "petals": {
+      "name": "Falling petals"
+    },
+    "aurora": {
+      "name": "Aurora"
+    },
+    "plain": {
+      "name": "Plain"
+    },
+    "mint": {
+      "name": "Mint"
+    },
+    "lavender": {
+      "name": "Lavender"
+    },
+    "notebook": {
+      "name": "Notebook"
+    },
+    "kraft": {
+      "name": "Brown paper"
+    },
+    "mini": {
+      "name": "Mini bomb",
+      "desc": "Breaks 1 building."
+    },
+    "big": {
+      "name": "Big bomb",
+      "desc": "Breaks 3 buildings."
+    },
+    "thunder": {
+      "name": "Thunder cloud",
+      "desc": "Breaks 5 buildings, and it rains on their town until they repair."
+    },
+    "shield": {
+      "name": "Shield",
+      "desc": "Turn it on to block the next bomb. Lasts up to 3 days."
+    }
+  },
+  "shield": {
+    "turnOn": "Turn on",
+    "onUntil": "On until {{time}}",
+    "raised": "Shield on. The next bomb will bounce off."
+  },
+  "iq": {
+    "goal": "+{{iq}} IQ for reaching today's goal."
+  },
+  "repair": {
+    "title_one": "1 building is damaged",
+    "title_other": "{{count}} buildings are damaged",
+    "study": "Study {{m}} min and they rebuild as you go.",
+    "pay": "Repair for {{iq}} IQ",
+    "paid": "Repaired for {{iq}} IQ.",
+    "oneLeft_one": "A building was rebuilt. 1 left to go.",
+    "oneLeft_other": "A building was rebuilt. {{count}} left to go.",
+    "allDone": "Your town is fully repaired."
+  },
+  "attack": {
+    "open": "Throw a bomb",
+    "pick": "Which one for {{name}}?",
+    "hits_one": "breaks 1",
+    "hits_other": "breaks {{count}}",
+    "cancel": "Never mind",
+    "none": "You have no bombs.",
+    "toShop": "Go to the shop",
+    "youPeaceful": "You're in peaceful mode, so you can't throw bombs.",
+    "theyPeaceful": "{{name}} is in peaceful mode.",
+    "tooSmall": "{{name}}'s town is too small to attack yet.",
+    "today": "You threw a bomb at {{name}} today. Try again tomorrow.",
+    "hit_one": "Boom! 1 of {{name}}'s buildings is damaged.",
+    "hit_other": "Boom! {{count}} of {{name}}'s buildings are damaged.",
+    "blocked": "{{name}}'s shield stopped your bomb.",
+    "bounced": "Your bomb bounced off. Half of {{name}}'s town is already damaged.",
+    "refused": "That didn't go through. You may have already thrown one today.",
+    "offline": "Couldn't throw it. Check your connection and try again."
+  },
+  "attacked": {
+    "title": "Your town was attacked!",
+    "titleSafe": "Someone threw a bomb at you",
+    "hit_one": "<b>{{name}}</b> threw a {{bomb}}. 1 building was damaged.",
+    "hit_other": "<b>{{name}}</b> threw a {{bomb}}. {{count}} buildings were damaged.",
+    "shield": "<b>{{name}}</b> threw a {{bomb}}, but your shield stopped it.",
+    "small": "<b>{{name}}</b> threw a {{bomb}}, but your town is too small to be damaged yet.",
+    "full": "<b>{{name}}</b> threw a {{bomb}}, but it bounced off: half your town was already damaged.",
+    "strike": "Visit their town",
+    "sum_one": "Repair it now for {{iq}} IQ, or study for {{m}} minutes and it rebuilds as you go.",
+    "sum_other": "Repair them now for {{iq}} IQ, or study for {{m}} minutes and they rebuild as you go.",
+    "study": "Study {{m}} min to repair",
+    "later": "Later",
+    "ok": "OK"
   }
 }

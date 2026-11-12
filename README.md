@@ -20,6 +20,17 @@ One codebase, three targets: web, Android and iOS, using [Capacitor](https://cap
 - Full clear: the town fills the whole screen (press F on a computer; Esc or the corner button to leave)
 - While a session runs and the app is closed: a live countdown notification on Android and a
   Live Activity on the iPhone lock screen and Dynamic Island
+- IQ, the in-app currency: 1 IQ per minute studied, +15 for reaching the daily goal, +25 per badge,
+  and 100 to start. The balance sits next to the profile button and opens the Shop and Bag
+- Shop: town themes (Autumn, Snow, Sakura, Desert), skies (Sunset, Starry night, Falling petals,
+  Aurora) and card skins (Mint, Lavender, Notebook, Brown paper). Friends see your town theme and sky
+- Bombs and shields: throw a Mini bomb (25 IQ, 1 building), Big bomb (60, 3) or Thunder cloud
+  (120, 5 and rain) at a friend's town from their page, once per friend per day. Damage is only
+  visual and never removes study time or buildings. Repair costs 10 IQ per building, or study:
+  every 10 minutes rebuilds one. A shield (50 IQ) blocks the next bomb for up to 3 days. At most
+  half a town can be damaged at once, towns with fewer than 3 buildings can't be hit, and
+  Peaceful mode in Settings turns bombs off both ways. Bombs that landed while you were away
+  are shown in a window the next time you open the app
 - Thai and English (i18next), switchable in Settings
 - Works fully as a guest, with all data stored on the device
 - Optional account (Firebase): email sign-up and log-in, password reset, email verification,
@@ -127,7 +138,7 @@ Without this the app runs in guest-only mode and hides the account features.
 5. **Project settings (gear) > General > Your apps > Web (`</>`)**: register an app (no hosting),
    then copy the `firebaseConfig` values into `src/firebase-config.js`.
 
-Whenever `firestore.rules` changes, publish it again (step 4). Version 1.5.0 added profile pictures to the rules. 6. Optional: **Authentication > Templates** to change the sender name and language of the
+Whenever `firestore.rules` changes, publish it again (step 4). Version 1.5.0 added profile pictures to the rules and 1.6.0 added bombs (`attacks`). 6. Optional: **Authentication > Templates** to change the sender name and language of the
 verification and password-reset emails.
 
 Do not add API key restrictions by HTTP referrer: the iOS app runs from `capacitor://localhost`.
@@ -174,6 +185,13 @@ To regenerate the icon and splash screen after editing `assets/logo.png`: `npm r
   it is backed up and merged back when you log in on any device.
 - The cloud backup is uploaded when a session ends, when the app goes to the background and when
   you log out, at most about once a minute otherwise. A session that is still running stays on the device.
+
+- IQ is counted on each device and merged with the account, so a determined player could fake it.
+  It's meant for friends; making it cheat-proof would need server code (Cloud Functions).
+- Bombs reach a friend the next time their app is open. The free Firebase plan can't send them
+  a push notification.
+- In `npm run dev:mock`, `mockCloud.attackMe('big', 'ploy')` in the browser console makes a demo
+  friend throw a bomb at you.
 
 ## CI
 

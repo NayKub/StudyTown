@@ -19,6 +19,7 @@
 
     <div class="card friendPanel" id="friendPanel" hidden></div>
 
+
     <div class="card timerCard">
       <div class="presets" id="presets"></div>
       <div class="ringwrap">
@@ -33,6 +34,11 @@
         <button class="btn" id="startBtn"></button>
         <button class="btn ghost" id="stopBtn"><span data-icon="stop"></span><span data-i18n="btn.stop"></span></button>
       </div>
+    </div>
+
+    <div class="card repairCard" id="repairCard" hidden>
+      <div class="repairText" id="repairText"></div>
+      <button class="btn small" id="repairPay"></button>
     </div>
 
     <div class="card next">
@@ -89,6 +95,7 @@
     <div class="badge" id="badge"></div>
     <div class="previewTag" id="previewTag"><span data-icon="eye"></span><span data-i18n="preview.tag"></span></div>
     <div class="stageBtns">
+      <button class="iqChip" id="iqBtn"><span id="iqVal">0</span><small>IQ</small></button>
       <button class="round" id="accountBtn" data-i18n-label="a11y.account"></button>
       <button class="round" id="logBtn" data-i18n-label="a11y.log" data-icon="calendar"></button>
       <button class="round" id="settingsBtn" data-i18n-label="a11y.settings" data-icon="settings"></button>
@@ -178,6 +185,25 @@
   </div>
 </div>
 
+<div class="modal sheet" id="shopModal">
+  <div class="card">
+    <div class="sheetHead">
+      <h2 class="ttl"><span data-icon="shop"></span><span data-i18n="shop.title"></span></h2>
+      <span class="shopIQ" id="shopIQ"></span>
+      <button class="round" data-close data-i18n-label="a11y.close" data-icon="close"></button>
+    </div>
+    <div class="tabs seg" id="shopTabs"></div>
+    <div id="shopBody"></div>
+  </div>
+</div>
+
+<div class="modal" id="attackModal">
+  <div class="card attackCard">
+    <h2 id="attackTitle"></h2>
+    <div id="attackBody"></div>
+  </div>
+</div>
+
 <div class="modal sheet" id="accountModal">
   <div class="card">
     <div class="sheetHead">
@@ -203,6 +229,7 @@
     <div class="setRow"><span data-i18n="settings.goal"></span><div class="tabs" id="goalTabs"></div></div>
     <label class="setRow"><span data-i18n="settings.notify"></span><input type="checkbox" class="switch" data-setting="notify"></label>
     <label class="setRow"><span data-i18n="settings.ongoing"></span><input type="checkbox" class="switch" data-setting="ongoing"></label>
+    <label class="setRow"><span><span data-i18n="settings.peaceful"></span><small class="setNote" data-i18n="settings.peacefulNote"></small></span><input type="checkbox" class="switch" id="peacefulSwitch"></label>
     <label class="setRow"><span data-i18n="settings.sound"></span><input type="checkbox" class="switch" data-setting="sound"></label>
     <label class="setRow"><span data-i18n="settings.haptics"></span><input type="checkbox" class="switch" data-setting="haptics"></label>
     <label class="setRow"><span data-i18n="settings.keepAwake"></span><input type="checkbox" class="switch" data-setting="keepAwake"></label>

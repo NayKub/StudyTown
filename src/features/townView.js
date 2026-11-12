@@ -62,8 +62,16 @@ function renderFriendPanel() {
       ${stat('stats.buildings', t('unit.pieces', { n: city.n }))}
       ${stat('visit.badges', num(p.badges))}
     </div>
+    <div class="attackBox" id="attackBox"></div>
     <button class="btn ghost" id="friendPanelBack">${icon('back')}<span>${t('visit.back')}</span></button>`;
   $('friendPanelBack').addEventListener('click', endVisit);
+  onPanelRendered();
+}
+
+let onPanelRendered = () => {};
+/** cb fills in the parts of the friend panel other features own (the attack box). */
+export function onFriendPanel(cb) {
+  onPanelRendered = cb;
 }
 
 export function renderVisitTitle() {
@@ -89,6 +97,9 @@ export function startVisit(friend) {
     totalMin: num(profile.totalMin),
     choices: decodeChoices(profile.build),
     chooseFrom: typeof profile.from === 'number' ? profile.from : null,
+    look: profile.look || null,
+    damage: profile.damage || null,
+    shieldUntil: num(profile.shieldUntil),
   };
   G.state.flags.visited = true;
   document.body.classList.add('visiting'); // lavender sky and frame, friend panel (see styles.css)

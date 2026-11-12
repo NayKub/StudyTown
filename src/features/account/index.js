@@ -48,6 +48,7 @@ async function onAuthChange(user) {
   if (!samePerson) {
     if (stopSocial) stopSocial();
     stopSocial = null;
+    if (session.hooks.onSignedOut) session.hooks.onSignedOut();
     resetSync();
     session.social = emptySocial();
     if (user) {
@@ -57,6 +58,8 @@ async function onAuthChange(user) {
         session.hooks.onFriendsChange();
       });
       await restoreAndSync();
+      // bombs thrown at you are applied after the backup is merged, so they land on the real town
+      if (session.user && session.user.uid === user.uid && session.hooks.onSignedIn) session.hooks.onSignedIn();
       // keep listening: when another device on this account uploads, merge it in right away
       if (session.user && session.user.uid === user.uid) startWatch();
     }

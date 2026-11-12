@@ -19,6 +19,7 @@ import { leaveLookOnlyViews, endVisit } from './townView.js';
 import { checkAchievements } from './achievements.js';
 import { renderWeek } from './studyLog.js';
 import { sync } from './account/index.js';
+import { studied } from './shop/economy.js';
 
 const PRESET_MINUTES = [15, 25, 45, 60];
 const MAX_CUSTOM_MINUTES = 240;
@@ -63,6 +64,14 @@ function setDuration(minutes) {
   renderTimer();
 }
 
+/** Start a session of this many minutes (used by "Study to repair"). Does nothing mid-session. */
+export function studyFor(minutes) {
+  if (timer.active || G.visit) return;
+  setDuration(clamp(Math.ceil(minutes), 1, MAX_CUSTOM_MINUTES));
+  renderPresets();
+  onStartClick();
+}
+
 function onPresetClick(e) {
   const chip = e.target.closest('.chip');
   if (!chip || timer.active) return;
@@ -92,6 +101,7 @@ export function credit() {
   G.state.totalSec += add;
   const k = todayKey();
   G.state.days[k] = (G.state.days[k] || 0) + add;
+  studied(add); // studying repairs bomb damage
   markDirty();
   checkGrowth();
 }

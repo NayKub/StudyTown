@@ -16,7 +16,15 @@ export const G = {
     goalMin: 60, // daily goal in minutes
     goalHitDay: '', // last day the "goal reached" celebration was shown
     flags: {}, // one-off things the player has done, e.g. { visited: true }
-    v: 3,
+    wallet: null, // IQ: see core/wallet.js (created at first launch)
+    look: null, // { ground, sky, card, at } chosen in the shop
+    damage: null, // buildings damaged by friends' bombs (core/wallet.js)
+    attacksSeen: {}, // attack id -> when it was applied
+    shieldUntil: 0,
+    shieldAt: 0,
+    peaceful: false, // can't attack or be attacked
+    peacefulAt: 0,
+    v: 4,
   },
   settings: { lang: null, keepAwake: false, sound: true, haptics: true, notify: true, ongoing: true, theme: 'system' },
   /** The study session in progress. `before` = seconds counted before the last resume. */
@@ -33,7 +41,9 @@ export const G = {
   /** Which town is on screen: your own, a "peek ahead" preview, or a friend's. */
   preview: false,
   previewMin: 600,
-  visit: null, // { name, totalMin, choices, chooseFrom } while looking at a friend's town
+  visit: null, // { name, totalMin, choices, chooseFrom, look, damage, ... } while looking at a friend's town
+  /** bombs falling right now: { plot, at, item } */
+  blasts: [],
   replayMin: null, // minutes shown by the time-lapse while it plays
   /** plot index -> start time of its "just built" animation */
   anims: {},

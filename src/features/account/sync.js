@@ -45,6 +45,11 @@ const sig = (st) =>
     count(st.badges),
     st.goalMin,
     (st.profile || {}).at || 0,
+    count((st.wallet || {}).spent) + count((st.wallet || {}).used) + count((st.wallet || {}).bonus),
+    (st.look || {}).at || 0,
+    (st.damage || {}).at || 0,
+    st.shieldAt || 0,
+    st.peacefulAt || 0,
   ].join('|');
 /** The public stats include "minutes today", so a new day also needs an upload. */
 const pushKey = (st) => sig(st) + '|' + todayKey();

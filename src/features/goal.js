@@ -6,6 +6,7 @@ import { $, toast } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
 import * as native from '../platform/native.js';
 import { saveNow } from './persistence.js';
+import { goalBonus } from './shop/economy.js';
 
 const RING_LENGTH = 163.36; // circumference of the goal ring in index.html (r = 26)
 
@@ -15,6 +16,7 @@ function celebrateIfReached(progress) {
   if (!progress.reached || G.state.goalHitDay === today) return;
   G.state.goalHitDay = today;
   toast(t('goal.reached', { m: progress.goal }));
+  goalBonus(today);
   if (G.settings.haptics) native.buzz('success');
   saveNow();
 }

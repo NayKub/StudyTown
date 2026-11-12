@@ -39,6 +39,36 @@ test('profile pictures: small JPEG photos and short avatar ids only', async () =
   await assertFails(setDoc(doc(as('alice'), 'profiles/alice'), { ...base, avatar: 'x'.repeat(50) }));
 });
 
+test('attacks: friends only, once a day, not on peaceful players, read and cleared by the target', async () => {
+  const day = Math.floor(Date.now() / 86400000);
+  const bomb = (from, to, extra = {}) => ({ from, to, item: 'big', fromName: from, fromAvatar: '', day, ...extra });
+  const id = (from, to, d = day) => `attacks/${from}_${to}_${d}`;
+  // strangers can't attack
+  await assertFails(setDoc(doc(as('alice'), id('alice', 'bob')), bomb('alice', 'bob')));
+  await seed(async (db) => {
+    await setDoc(doc(db, 'friends/alice/list/bob'), { name: 'Bob' });
+    await setDoc(doc(db, 'friends/bob/list/alice'), { name: 'Alice' });
+    await setDoc(doc(db, 'friends/alice/list/carol'), { name: 'Carol' });
+    await setDoc(doc(db, 'friends/carol/list/alice'), { name: 'Alice' });
+    await setDoc(doc(db, 'profiles/carol'), { name: 'Carol', code: 'CCCCCC', totalMin: 0, peaceful: true });
+  });
+  // wrong sender, wrong item, wrong day, id that doesn't match
+  await assertFails(setDoc(doc(as('alice'), id('bob', 'alice')), bomb('bob', 'alice')));
+  await assertFails(setDoc(doc(as('alice'), id('alice', 'bob')), bomb('alice', 'bob', { item: 'nuke' })));
+  await assertFails(setDoc(doc(as('alice'), id('alice', 'bob', day - 3)), bomb('alice', 'bob', { day: day - 3 })));
+  await assertFails(setDoc(doc(as('alice'), 'attacks/whatever'), bomb('alice', 'bob')));
+  // a friend can, once a day
+  await assertSucceeds(setDoc(doc(as('alice'), id('alice', 'bob')), bomb('alice', 'bob')));
+  await assertFails(setDoc(doc(as('alice'), id('alice', 'bob')), bomb('alice', 'bob', { item: 'mini' })));
+  // peaceful players can't be attacked
+  await assertFails(setDoc(doc(as('alice'), id('alice', 'carol')), bomb('alice', 'carol')));
+  // the target sees it and clears it; others can't list it
+  await assertSucceeds(getDocs(query(collection(as('bob'), 'attacks'), where('to', '==', 'bob'))));
+  await assertFails(getDocs(query(collection(as('carol'), 'attacks'), where('to', '==', 'bob'))));
+  await assertFails(deleteDoc(doc(as('carol'), id('alice', 'bob'))));
+  await assertSucceeds(deleteDoc(doc(as('bob'), id('alice', 'bob'))));
+});
+
 test('codes and emails: exact get only, no listing, no hijacking', async () => {
   await assertSucceeds(setDoc(doc(as('alice'), 'codes/ABC234'), { uid: 'alice', name: 'Alice' }));
   await assertFails(setDoc(doc(as('bob'), 'codes/ABC234'), { uid: 'bob', name: 'Bob' }));

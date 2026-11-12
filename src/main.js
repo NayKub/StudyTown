@@ -8,6 +8,7 @@ import './styles.css';
 import { G, realMin } from './core/state.js';
 import { cityAt, encodeChoices } from './core/city.js';
 import { publicStats } from './core/dates.js';
+import { newWallet } from './core/wallet.js';
 import { initI18n, applyI18n, t, detectLang, locale } from './i18n/index.js';
 import { loadState, loadSettings } from './platform/storage.js';
 import * as native from './platform/native.js';
@@ -29,6 +30,10 @@ import * as fullClear from './features/fullClear.js';
 import { setSheet, isSheetOpen } from './features/bottomSheet.js';
 import { hideModal } from './ui/dom.js';
 import * as account from './features/account/index.js';
+import * as economy from './features/shop/economy.js';
+import * as shop from './features/shop/shopSheet.js';
+import * as attacks from './features/shop/attacks.js';
+import { lookOf, damagedPlots } from './core/wallet.js';
 
 const TICK_MS = 250;
 const HISTORY_REFRESH_MS = 5000;
@@ -49,6 +54,8 @@ function renderAll() {
   build.renderBuildChip();
   build.renderBuildTexts();
   studyLog.renderLogIfOpen();
+  shop.renderShopTexts();
+  economy.renderRepairCard();
 }
 
 function tick() {
@@ -58,6 +65,7 @@ function tick() {
   renderGoal();
   build.renderBuildChip();
   fullClear.renderFullTime();
+  economy.renderIQ();
   saveIfDue();
   account.sync(false);
   account.refresh(false);
@@ -75,6 +83,10 @@ function replaceState(merged) {
   achievements.renderShelf();
   achievements.checkAchievements(); // another device may have brought study time that earns one
   account.refreshProfile(); // and maybe a new profile picture
+  economy.applyCardSkin(); // a look bought on another device
+  economy.renderRepairCard();
+  economy.renderIQ();
+  economy.changed();
 }
 
 /** What friends can see: numbers, the buildings you chose, and how many badges you have. */
@@ -85,6 +97,11 @@ const sharedProfile = () => ({
   badges: Object.keys(G.state.badges).length,
   avatar: G.state.profile.avatar || '',
   photo: G.state.profile.photo || '',
+  // so friends see your town as you do, and the damage their bombs did
+  look: { ground: lookOf(G.state).ground, sky: lookOf(G.state).sky },
+  damage: { plots: damagedPlots(G.state), rain: !!(G.state.damage && G.state.damage.rain) },
+  shieldUntil: G.state.shieldUntil || 0,
+  peaceful: !!G.state.peaceful,
 });
 
 /** The app came to the front (true) or went to the background (false). */
@@ -170,10 +187,14 @@ async function loadSavedData() {
   // Towns from before "choose what to build" keep their buildings; only later plots wait for a choice.
   if (G.state.chooseFrom == null) G.state.chooseFrom = Math.max(1, cityAt(realMin()).n);
   if (!G.state.profile || typeof G.state.profile !== 'object') G.state.profile = { avatar: '', photo: '', at: 0 };
-  for (const key of ['choices', 'badges', 'flags']) {
+  if (!G.state.wallet || typeof G.state.wallet !== 'object') G.state.wallet = newWallet(realMin());
+  for (const key of ['bonus', 'spent', 'used']) {
+    if (!G.state.wallet[key] || typeof G.state.wallet[key] !== 'object') G.state.wallet[key] = {};
+  }
+  for (const key of ['choices', 'badges', 'flags', 'attacksSeen']) {
     if (!G.state[key] || typeof G.state[key] !== 'object') G.state[key] = {};
   }
-  G.state.v = 3;
+  G.state.v = 4;
 }
 
 async function boot() {
@@ -195,11 +216,23 @@ async function boot() {
       achievements.checkAchievements();
       account.sync(true);
     },
+    onPeacefulChanged() {
+      economy.changed();
+    },
   });
   build.initBuild({ onChoice: () => account.sync(true) });
   achievements.initAchievements({ onNewBadge: () => account.sync(true) });
   bindSheetClosing();
   fullClear.initFullClear();
+  economy.initEconomy();
+  shop.initShopSheet();
+  economy.onEconomyChange(() => account.sync(true));
+  attacks.initAttacks({
+    visit: townView.startVisit,
+    startStudy: timer.studyFor,
+    sync: () => account.sync(true),
+  });
+  townView.onFriendPanel(attacks.renderAttackBox);
 
   startRender($('cv'));
   renderAll();
@@ -210,6 +243,8 @@ async function boot() {
     stats: sharedProfile,
     visit: townView.startVisit,
     onFriendsChange: achievements.checkAchievements,
+    onSignedIn: attacks.watchForAttacks,
+    onSignedOut: attacks.stopWatchingAttacks,
   });
 
   timer.applyAwake();

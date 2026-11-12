@@ -43,17 +43,19 @@ function load() {
         name: 'Ploy',
         avatar: 'frog',
         code: 'PLY567',
-        totalMin: 95,
+        totalMin: 420,
         todayMin: 0,
         dayKey: '',
-        weekMin: 95,
-        streak: 0,
+        weekMin: 180,
+        streak: 3,
+        look: { ground: 'sakura', sky: 'petals' },
       },
     },
     backups: {},
     requests: {},
     friends: {},
     seededRequest: false,
+    attacks: {},
   };
 }
 const S = load();
@@ -64,6 +66,7 @@ const save = () => {
     /* ignore */
   }
   emitAll();
+  emitAttacks();
 };
 const user = () => (S.session ? S.users[S.session] : null);
 const info = (u) =>
@@ -274,3 +277,54 @@ export function watchSocial(cb) {
   setTimeout(() => cb(snapshot()), 30);
   return () => watchers.delete(cb);
 }
+
+// ---------- attacks ----------
+const attackWatchers = new Set();
+const myAttacks = () =>
+  Object.entries(S.attacks || {})
+    .filter(([, a]) => a.to === S.session)
+    .map(([id, a]) => ({ id, ...a }));
+const emitAttacks = () => attackWatchers.forEach((cb) => cb(myAttacks()));
+
+export async function sendAttack(target, item, myName, myAvatar, day) {
+  await wait();
+  const uid = S.session;
+  if (!(S.friends[uid] || {})[target]) throw err('permission-denied');
+  if ((S.profiles[target] || {}).peaceful) throw err('permission-denied');
+  const id = `${uid}_${target}_${day}`;
+  S.attacks = S.attacks || {};
+  if (S.attacks[id] || (S.attacksDone || {})[id]) throw err('permission-denied');
+  S.attacks[id] = { from: uid, to: target, item, fromName: myName, fromAvatar: myAvatar, day };
+  save();
+  return id;
+}
+export function watchAttacks(cb) {
+  attackWatchers.add(cb);
+  setTimeout(() => cb(myAttacks()), 60);
+  return () => attackWatchers.delete(cb);
+}
+export async function clearAttack(id) {
+  if (!S.attacks || !S.attacks[id]) return;
+  (S.attacksDone = S.attacksDone || {})[id] = 1;
+  delete S.attacks[id];
+  save();
+}
+
+/** For trying it out: a demo friend throws a bomb at you (window.mockCloud.attackMe('big')). */
+function attackMe(item = 'big', from = 'mint') {
+  const uid = S.session;
+  if (!uid) return;
+  const p = S.profiles[from] || {};
+  S.attacks = S.attacks || {};
+  S.attacks[`${from}_${uid}_${Date.now()}`] = {
+    from,
+    to: uid,
+    item,
+    fromName: p.name,
+    fromAvatar: p.avatar || '',
+    day: 0,
+  };
+  save();
+  emitAttacks();
+}
+if (typeof window !== 'undefined') window.mockCloud = { attackMe };
