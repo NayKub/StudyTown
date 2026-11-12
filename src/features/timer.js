@@ -5,7 +5,7 @@
 // have passed since the last call into the saved totals.
 import { G } from '../core/state.js';
 import { clamp } from '../core/util.js';
-import { todayKey } from '../core/dates.js';
+import { splitByDay } from '../core/dates.js';
 import { t } from '../i18n/index.js';
 import { $, toast, showModal, hideModal } from '../ui/dom.js';
 import { icon } from '../ui/icons.js';
@@ -99,8 +99,9 @@ export function credit() {
   if (add <= 0) return;
   timer.credited += add;
   G.state.totalSec += add;
-  const k = todayKey();
-  G.state.days[k] = (G.state.days[k] || 0) + add;
+  // the new seconds end now, or when the session ran out if the app was closed past that moment
+  const endsAt = timer.running ? Math.min(Date.now(), timer.startedAt + (timer.dur - timer.before) * 1000) : Date.now();
+  for (const [k, sec] of splitByDay(endsAt, add)) G.state.days[k] = (G.state.days[k] || 0) + sec;
   studied(add); // studying repairs bomb damage
   markDirty();
   checkGrowth();

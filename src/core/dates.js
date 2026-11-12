@@ -5,6 +5,25 @@ export const todayKey = (d = new Date()) =>
   d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 
 /** The last n days, oldest first, as [{ k: dayKey, d: Date }]. */
+/**
+ * Seconds studied in the stretch of time ending at `endMs`, shared out over the days they fell
+ * on: a session from 23:30 to 00:30 gives 30 minutes to each day. Returns [[dayKey, seconds], ...].
+ */
+export function splitByDay(endMs, seconds) {
+  const out = [];
+  let end = endMs;
+  let left = seconds;
+  while (left > 0) {
+    const midnight = new Date(end - 1);
+    midnight.setHours(0, 0, 0, 0);
+    const part = Math.min(left, Math.ceil((end - midnight.getTime()) / 1000));
+    out.push([todayKey(new Date(end - 1)), part]);
+    left -= part;
+    end = midnight.getTime();
+  }
+  return out;
+}
+
 export function lastDays(n, now = new Date()) {
   const out = [];
   const d = new Date(now);

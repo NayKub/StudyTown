@@ -21,6 +21,9 @@ let lastUpload = 0;
 let uploading = null;
 let lastFull = 0;
 let fullJob = null;
+// Whose backup has been downloaded and merged on this device. Until then nothing is uploaded: a
+// fresh install that just logged in has an empty town, and uploading it would wipe the account.
+let restoredFor = null;
 
 export const syncStatus = () => syncState;
 /** cb runs whenever the status changes (the account sheet re-renders itself). */
@@ -60,6 +63,7 @@ const upload = (st) => Promise.all([cloud.pushBackup(st), cloud.pushStats(sessio
 export function resetSync() {
   stopWatch();
   pushedKey = '';
+  restoredFor = null;
   syncState = { status: 'busy', code: '', at: 0 };
 }
 
@@ -82,12 +86,15 @@ export async function restoreAndSync() {
   const { hooks } = session;
   if (syncState.status !== 'ok') setSync('busy');
   try {
+    const uid = session.user && session.user.uid;
     const remote = await cloud.pullBackup();
+    if (!session.user || session.user.uid !== uid) return; // logged out or switched while downloading
     if (remote) {
       const local = hooks.getState();
       const merged = mergeStates(local, remote);
       if (sig(merged) !== sig(local)) hooks.replaceState(merged);
     }
+    restoredFor = uid;
     const st = hooks.getState();
     if (!remote || sig(st) !== sig(remote) || pushKey(st) !== pushedKey) await upload(st);
     pushedKey = pushKey(st);
@@ -101,6 +108,7 @@ export async function restoreAndSync() {
 
 function onRemoteBackup(remote) {
   const { hooks } = session;
+  if (!session.user || restoredFor !== session.user.uid) return; // the first download is still on its way
   const local = hooks.getState();
   const merged = mergeStates(local, remote);
   if (sig(merged) !== sig(local)) hooks.replaceState(merged); // the other device had something new
@@ -114,7 +122,7 @@ function onRemoteBackup(remote) {
 
 /** Upload backup + public stats. Skipped when nothing changed; throttled to once a minute unless forced. */
 export function sync(force) {
-  if (!session.user) return Promise.resolve();
+  if (!session.user || restoredFor !== session.user.uid) return Promise.resolve();
   const st = session.hooks.getState();
   const key = pushKey(st);
   if (key === pushedKey) return Promise.resolve();

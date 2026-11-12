@@ -103,3 +103,19 @@ describe('daily goal', () => {
     expect(goalDays(state)).toBe(2);
   });
 });
+
+describe('splitByDay', () => {
+  it('keeps time within one day together', async () => {
+    const { splitByDay } = await import('../../src/core/dates.js');
+    const end = new Date(2026, 10, 12, 15, 0, 0).getTime();
+    expect(splitByDay(end, 1500)).toEqual([['2026-11-12', 1500]]);
+  });
+  it('shares a session across midnight between the two days', async () => {
+    const { splitByDay } = await import('../../src/core/dates.js');
+    const end = new Date(2026, 10, 12, 0, 30, 0).getTime();
+    expect(splitByDay(end, 3600)).toEqual([
+      ['2026-11-12', 1800],
+      ['2026-11-11', 1800],
+    ]);
+  });
+});
