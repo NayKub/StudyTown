@@ -1886,24 +1886,31 @@ body.fullClear .fullTimer:not([hidden]) {
 }
 
 /* ---------- IQ, shop and bag ---------- */
+/* the IQ balance with the shop button under it, below the round buttons on the right */
+.walletStack {
+  position: absolute;
+  top: 64px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
 .iqChip {
-  height: 44px;
-  min-width: 44px;
+  height: 34px;
   padding: 0 12px;
-  border-radius: 22px;
+  border-radius: 17px;
   border: 2px solid var(--line);
   background: var(--glass);
   color: var(--ink);
-  font: inherit;
   font-weight: 800;
   font-size: 15px;
   display: inline-flex;
   align-items: baseline;
-  justify-content: center;
   gap: 3px;
-  line-height: 40px;
-  cursor: pointer;
+  line-height: 30px;
   font-variant-numeric: tabular-nums;
+  user-select: none;
 }
 .iqChip small {
   font-size: 11px;
@@ -1911,43 +1918,18 @@ body.fullClear .fullTimer:not([hidden]) {
   color: var(--pinkd);
   letter-spacing: 0.02em;
 }
-.iqChip:active {
-  transform: translateY(1px);
-}
-.badge {
-  max-width: calc(100% - 330px); /* the IQ chip and four round buttons on the right */
-}
-.noCloud .badge {
-  max-width: calc(100% - 270px);
-}
-/* phones: the IQ chip sits under the round buttons so the town name keeps its room */
-@media (max-width: 899px) {
-  .iqChip {
-    position: absolute;
-    top: 52px;
-    right: 0;
-    height: 34px;
-    line-height: 30px;
-    font-size: 14px;
-    padding: 0 10px;
-  }
-  .badge {
-    max-width: calc(100% - 244px);
-  }
-  .noCloud .badge {
-    max-width: calc(100% - 190px);
-  }
-}
 @media (max-width: 380px) {
-  .iqChip {
-    top: 48px;
+  .walletStack {
+    top: 60px;
   }
-  .badge {
-    max-width: calc(100% - 214px);
+  .iqChip {
+    height: 32px;
+    line-height: 28px;
+    font-size: 14px;
   }
 }
-body.visiting .iqChip,
-body.fullClear .iqChip {
+body.visiting .walletStack,
+body.fullClear .walletStack {
   display: none;
 }
 

@@ -157,7 +157,8 @@
     "close": "Close",
     "account": "Account",
     "full": "Full screen town",
-    "fullExit": "Exit full screen"
+    "fullExit": "Exit full screen",
+    "shop": "Shop"
   },
   "sheet": {
     "more": "Swipe up for more",
@@ -399,7 +400,6 @@
   },
   "shop": {
     "title": "Shop",
-    "open": "Shop, you have {{iq}} IQ",
     "tab": {
       "shop": "Shop",
       "bag": "Bag"

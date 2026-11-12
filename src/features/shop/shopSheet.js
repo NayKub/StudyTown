@@ -179,7 +179,7 @@ export function openShop(which = 'shop') {
 }
 
 export function initShopSheet() {
-  $('iqBtn').addEventListener('click', () => openShop('shop'));
+  $('shopBtn').addEventListener('click', () => openShop('shop'));
   $('shopTabs').innerHTML = ['shop', 'bag']
     .map(
       (k) =>

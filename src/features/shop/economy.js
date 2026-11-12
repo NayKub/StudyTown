@@ -31,7 +31,6 @@ export function renderIQ() {
   if (iq === shownIQ) return;
   shownIQ = iq;
   $('iqVal').textContent = iq.toLocaleString();
-  $('iqBtn').setAttribute('aria-label', t('shop.open', { iq }));
 }
 
 /** Daily goal reached: a bonus once per day. */
