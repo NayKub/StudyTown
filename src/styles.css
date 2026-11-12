@@ -1554,8 +1554,11 @@ body.replaying .toasts {
 h2.ttl {
   display: flex;
 }
+/* anything holding an icon keeps it centred, also when it is a fixed-size circle */
 [data-icon] {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn .ico,
 .chip .ico,
