@@ -120,7 +120,11 @@
       </div>
     </div>
     <div class="visitPill" id="visitBar" hidden><span id="visitPic"></span><span id="visitText"></span><span class="visitTimer" id="visitTimer" hidden></span><button class="visitBack" id="visitBack" data-i18n-label="visit.back"><span data-icon="back"></span><span data-i18n="visit.backShort"></span></button></div>
-    <div class="visitBar replayBar" id="replayBar" hidden><span data-icon="film"></span><span id="replayText"></span><button class="chip" id="replayStop" data-i18n="replay.stop"></button></div>
+    <div class="replayBar" id="replayBar" hidden>
+      <span class="rpIcon" data-icon="film"></span>
+      <div class="rpMain"><span id="replayText"></span><span class="rpTrack"><span class="rpFill" id="replayFill"></span></span></div>
+      <button class="rpStop" id="replayStop" data-i18n-label="replay.stop" data-icon="stop"></button>
+    </div>
     <button class="buildChip" id="buildBtn" hidden><span data-icon="hammer"></span><span id="buildCount"></span></button>
     <div class="sheetShade" id="sheetShade"></div>
     <div class="toasts" id="toasts"></div>

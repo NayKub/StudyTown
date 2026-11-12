@@ -1444,16 +1444,77 @@ body.visiting .side > .card:not(.friendPanel) {
   font-size: 13px;
   text-align: center;
 }
-.visitBar.replayBar {
-  background: var(--pink);
-  box-shadow: 0 4px 0 var(--pinkd);
+/* the time-lapse: a small player pill at the bottom of the town, with its own progress line */
+.replayBar {
+  position: absolute;
+  left: 50%;
+  bottom: max(16px, calc(var(--sab) + 8px));
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 6px 6px 12px;
+  border-radius: 99px;
+  background: var(--glass);
+  border: 2px solid var(--line);
+  box-shadow: 0 6px 18px var(--shadow);
+  color: var(--ink);
 }
-.visitBar.replayBar #replayText {
-  flex: 1;
+.replayBar[hidden] {
+  display: none;
+}
+.rpIcon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--yellow), var(--pink));
+  color: #4a2b3a;
+  font-size: 16px;
+}
+.rpMain {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 128px;
+}
+#replayText {
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1;
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
-.visitBar.replayBar .chip {
+.rpTrack {
+  display: block;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--track);
+  overflow: hidden;
+}
+.rpFill {
+  display: block;
+  height: 100%;
+  width: 0;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--yellow), var(--pink));
+}
+.rpStop {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  background: var(--surface);
   color: var(--pinkd);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  cursor: pointer;
+}
+body.replaying .hint {
+  display: none;
 }
 body.replaying .preview {
   display: none;

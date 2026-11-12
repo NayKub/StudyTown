@@ -164,6 +164,7 @@ export function startReplay() {
     const count = cityAt(G.replayMin).n;
     for (; shown < count; shown++) G.anims[shown] = now; // each new building pops up
     $('replayText').textContent = t('replay.title', { time: fmtMin(Math.floor(G.replayMin)) });
+    $('replayFill').style.width = (f * 100).toFixed(1) + '%';
     if (now - startedAt < REPLAY_MS + REPLAY_HOLD_MS) {
       replayFrame = requestAnimationFrame(step);
       return;
