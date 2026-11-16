@@ -3,6 +3,7 @@ name: Build
 on:
   push:
     branches: [main]
+    tags: ['v*'] # a version tag also publishes a GitHub release (job "release" below)
   pull_request:
   workflow_dispatch:
 
@@ -101,3 +102,30 @@ jobs:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.files }}
           if-no-files-found: error
+
+  # On a version tag (v1.6.0), put the Android APK, Windows installer and Mac disk image on the
+  # repository's Releases page.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [android, desktop]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - name: Collect the files
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          mkdir out
+          cp artifacts/android-debug-apk/app-debug.apk "out/MyLittleTown-$v-android.apk"
+          cp artifacts/desktop-windows/*.exe out/
+          cp artifacts/desktop-mac/*.dmg out/
+          ls -la out
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          gh release create "$GITHUB_REF_NAME" out/* --title "My Little Town $v" --notes-file .github/release-notes.md
