@@ -1,0 +1,69 @@
+{
+  "name": "my-little-town-desktop",
+  "productName": "My Little Town",
+  "version": "1.6.0",
+  "description": "Study timer that grows a little town",
+  "author": "NayKub",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "prepare-web": "node prepare.cjs",
+    "start": "npm run prepare-web && electron .",
+    "dist:win": "npm run prepare-web && electron-builder --win",
+    "dist:mac": "npm run prepare-web && electron-builder --mac"
+  },
+  "build": {
+    "appId": "com.example.studytown",
+    "productName": "My Little Town",
+    "artifactName": "MyLittleTown-${version}-${os}.${ext}",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.cjs",
+      "web/**/*"
+    ],
+    "icon": "build/icon.png",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "My Little Town"
+    },
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.education",
+      "identity": "-"
+    },
+    "dmg": {
+      "title": "My Little Town"
+    }
+  },
+  "devDependencies": {
+    "electron": "^45.3.2",
+    "electron-builder": "^26.18.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NayKub/StudyTown.git"
+  }
+}

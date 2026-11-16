@@ -68,3 +68,36 @@ jobs:
             -configuration Debug -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO build
+
+  desktop:
+    needs: web
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, target: win, artifact: desktop-windows, files: 'desktop/release/*.exe' }
+          - { os: macos-latest, target: mac, artifact: desktop-mac, files: 'desktop/release/*.dmg' }
+    runs-on: ${{ matrix.os }}
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: 'false' # no paid signing certificate yet: Mac builds are ad-hoc signed
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            desktop/package-lock.json
+      - run: npm ci
+      - run: npm run build
+      - run: npm ci
+        working-directory: desktop
+      - name: Build the ${{ matrix.target }} installer
+        run: npm run dist:${{ matrix.target }} -- --publish never
+        working-directory: desktop
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.files }}
+          if-no-files-found: error

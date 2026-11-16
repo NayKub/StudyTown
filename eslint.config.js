@@ -2,7 +2,18 @@ import js from '@eslint/js';
 import globals from 'globals';
 
 export default [
-  { ignores: ['dist/', 'dist-mock/', 'android/', 'ios/', 'node_modules/'] },
+  {
+    ignores: [
+      'dist/',
+      'dist-mock/',
+      'android/',
+      'ios/',
+      'node_modules/',
+      'desktop/web/',
+      'desktop/release/',
+      'desktop/node_modules/',
+    ],
+  },
   js.configs.recommended,
   {
     files: ['src/**/*.js'],
@@ -17,6 +28,10 @@ export default [
       'prefer-const': 'error',
       'no-unused-vars': ['error', { argsIgnorePattern: '^_', ignoreRestSiblings: true }],
     },
+  },
+  {
+    files: ['desktop/*.cjs'],
+    languageOptions: { ecmaVersion: 'latest', sourceType: 'commonjs', globals: globals.node },
   },
   {
     files: ['tests/**/*.{js,mjs}', '*.config.js'],

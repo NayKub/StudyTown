@@ -6,3 +6,6 @@ dist/
 dist-mock/
 firebase-debug.log*
 firestore-debug.log
+desktop/web/
+desktop/release/
+desktop/node_modules/
